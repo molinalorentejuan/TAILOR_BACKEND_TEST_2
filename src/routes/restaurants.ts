@@ -10,6 +10,7 @@ import {
 import {
   RestaurantsQueryDTO,
   CreateRestaurantDTO,
+  RestaurantsQueryInput
 } from "../dto/restaurantDTO";
 import { CreateReviewDTO, ReviewIdParamDTO } from "../dto/reviewDTO";
 import { container } from "../container";
@@ -27,7 +28,9 @@ router.get(
   cacheMiddleware,
   (req, res, next) => {
     try {
-      const result = restaurantService.listRestaurants(req.query);
+      const result = restaurantService.listRestaurants(
+        req.query as RestaurantsQueryInput   // FIX
+      );
       return res.json(result);
     } catch (err) {
       next(err);
@@ -40,12 +43,12 @@ router.get(
  */
 router.get(
   "/:id",
-  validateParams(ReviewIdParamDTO), // reutilizamos id:number DTO
+  validateParams(ReviewIdParamDTO),
   cacheMiddleware,
   (req, res, next) => {
     try {
       const { id } = req.params;
-      const restaurant = restaurantService.getRestaurantById(id);
+      const restaurant = restaurantService.getRestaurantById(Number(id)); // FIX
       return res.json(restaurant);
     } catch (err) {
       next(err);
@@ -63,7 +66,7 @@ router.get(
   (req, res, next) => {
     try {
       const { id } = req.params;
-      const reviews = restaurantService.listReviewsForRestaurant(id);
+      const reviews = restaurantService.listReviewsForRestaurant(Number(id)); // FIX
       return res.json(reviews);
     } catch (err) {
       next(err);
@@ -86,7 +89,7 @@ router.post(
 
       const result = restaurantService.createReviewForRestaurant({
         userId: req.user!.id,
-        restaurantId: id,
+        restaurantId: Number(id),   // FIX
         rating,
         comment,
       });

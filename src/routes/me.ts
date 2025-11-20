@@ -51,12 +51,11 @@ router.put(
       const { id } = req.params;
       const { rating, comment } = req.body;
 
-      userService.updateUserReview({
-        reviewId: id,
-        userId: req.user!.id,
-        rating,
-        comment,
-      });
+      userService.updateUserReview(
+        { id: Number(id) },        // params
+        { rating, comment },       // data
+        req.user!.id               // context
+      );
 
       invalidateCache();
       return res.json({ message: "Review updated" });
@@ -77,7 +76,10 @@ router.delete(
     try {
       const { id } = req.params;
 
-      userService.deleteUserReview(id, req.user!.id);
+      userService.deleteUserReview(
+        { id: Number(id) },        // params (CORREGIDO)
+        req.user!.id               // context
+      );
 
       invalidateCache();
       return res.status(204).send();

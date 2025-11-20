@@ -113,4 +113,18 @@ export class ReviewRepository {
       )
       .run(userId, restaurantId, rating, comments || null);
   }
+
+  /**
+   * Obtener review por ID (sin filtrar por usuario)
+   */
+  findReviewById(reviewId: number): ReviewRow | undefined {
+    return db
+      .prepare(`
+        SELECT *
+        FROM reviews
+        WHERE id = ?
+      `)
+      .get(reviewId) as ReviewRow | undefined;
+  }
+
 }

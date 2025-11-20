@@ -24,13 +24,13 @@ export class RestaurantService {
    * Listar restaurantes con filtros validados (DTO)
    */
   listRestaurants(query: RestaurantsQueryInput) {
-    const { page, limit, cuisine, rating, neighborhood, sort } = query;
+    const { page, limit, cuisine_type, rating, neighborhood, sort } = query;
 
     const where: string[] = [];
     const params: any[] = [];
 
     // columna REAL en la DB
-    if (cuisine) {
+    if (cuisine_type) {
       where.push("cuisine_type = ?");
       params.push(cuisine);
     }
@@ -121,7 +121,7 @@ export class RestaurantService {
    * Actualizar review
    */
   updateReviewForRestaurant(reviewId: number, data: UpdateReviewInput) {
-    const existing = this.reviewRepo.findReview(reviewId);
+    const existing = this.reviewRepo.findReviewById(reviewId);
     if (!existing) {
       throw new AppError("Review not found", 404, "REVIEW_NOT_FOUND");
     }

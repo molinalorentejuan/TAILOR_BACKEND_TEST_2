@@ -1,4 +1,3 @@
-// src/services/RestaurantAdminService.ts
 import { injectable, inject } from "tsyringe";
 import { RestaurantAdminRepository } from "../repositories/restaurantAdminRepository";
 import { OperatingHoursRepository } from "../repositories/operatingHoursRepository";
