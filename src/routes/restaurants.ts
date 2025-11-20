@@ -82,12 +82,12 @@ router.post(
   validateBody(CreateReviewDTO),
   (req: AuthRequest, res, next) => {
     try {
-      const restaurantId = Number(req.params.id);
+      const restaurant_id = Number(req.params.id);
       const { rating, comment } = req.body;
 
       const result = restaurantService.createReviewForRestaurant({
         user_id: req.user!.id,
-        restaurant_id,
+        restaurantId,
         rating,
         comment,
       });
