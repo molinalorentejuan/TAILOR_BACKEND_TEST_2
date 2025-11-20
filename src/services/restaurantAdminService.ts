@@ -34,7 +34,7 @@ export class RestaurantAdminService {
     const id = this.repo.insertRestaurant(
       name,
       neighborhood ?? null,
-      cuisine ?? null,
+      cuisine_type ?? null,
       rating,
       address ?? null,
       photograph ?? null,
@@ -74,7 +74,7 @@ export class RestaurantAdminService {
       id,
       name ?? null,
       neighborhood ?? null,
-      cuisine ?? null,
+      cuisine_type ?? null,
       rating ?? null,
       address ?? null,
       photograph ?? null,

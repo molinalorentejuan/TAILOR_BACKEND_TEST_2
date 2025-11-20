@@ -93,7 +93,7 @@ export class RestaurantService {
   createReviewForRestaurant(input: CreateReviewInput) {
     const { user_id, restaurant_id, rating, comment } = input;
 
-    const exists = this.restaurantRepo.findRestaurantById(restaurantId);
+    const exists = this.restaurantRepo.findRestaurantById(restaurant_id);
     if (!exists) {
       throw new AppError("Restaurant not found", 404, "RESTAURANT_NOT_FOUND");
     }
@@ -108,7 +108,7 @@ export class RestaurantService {
 
     return {
       id: info.lastInsertRowid,
-      restaurantId,
+      restaurant_id,
       rating,
       comment,
     };
