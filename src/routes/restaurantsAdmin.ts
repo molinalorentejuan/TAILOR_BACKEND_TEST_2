@@ -6,7 +6,7 @@ import { invalidateCache } from "../middleware/cache";
 import {
   CreateRestaurantDTO,
   UpdateRestaurantDTO,
-} from "../dto/RestaurantDTO";
+} from "../dto/restaurantDTO";
 import { container } from "../container";
 import { RestaurantAdminService } from "../services/restaurantAdminService";
 

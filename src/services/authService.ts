@@ -4,7 +4,7 @@ import { injectable, inject } from "tsyringe";
 import { signToken } from "../utils/jwt";
 import { AuthRepository, DBUser } from "../repositories/authRepository";
 import { AppError } from "../errors/appError";
-import { RegisterInput, LoginInput } from "../dto/auth.dto";
+import { RegisterInput, LoginInput } from "../dto/authDTO";
 
 @injectable()
 export class AuthService {
