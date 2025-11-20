@@ -3,23 +3,23 @@ import { container } from "tsyringe";
 /**
  * REPOSITORIES (DI COMPLETE)
  */
-import { AdminRepository } from "./repositories/AdminRepository";
-import { AuthRepository } from "./repositories/AuthRepository";
-import { FavoriteRepository } from "./repositories/FavoriteRepository";
-import { RestaurantAdminRepository } from "./repositories/RestaurantAdminRepository";
-import { RestaurantRepository } from "./repositories/RestaurantRepository";
-import { ReviewRepository } from "./repositories/ReviewRepository";
-import { UserRepository } from "./repositories/UserRepository";
-import { OperatingHoursRepository } from "./repositories/OperatingHoursRepository";
+import { AdminRepository } from "./repositories/adminRepository";
+import { AuthRepository } from "./repositories/authRepository";
+import { FavoriteRepository } from "./repositories/favoriteRepository";
+import { RestaurantAdminRepository } from "./repositories/restaurantAdminRepository";
+import { RestaurantRepository } from "./repositories/restaurantRepository";
+import { ReviewRepository } from "./repositories/reviewRepository";
+import { UserRepository } from "./repositories/userRepository";
+import { OperatingHoursRepository } from "./repositories/operatingHoursRepository";
 
 /**
  * SERVICES
  */
-import { AuthService } from "./services/AuthService";
-import { AdminService } from "./services/AdminService";
-import { RestaurantAdminService } from "./services/RestaurantAdminService";
-import { RestaurantService } from "./services/RestaurantService";
-import { UserService } from "./services/UserService";
+import { AuthService } from "./services/authService";
+import { AdminService } from "./services/adminService";
+import { RestaurantAdminService } from "./services/restaurantAdminService";
+import { RestaurantService } from "./services/restaurantService";
+import { UserService } from "./services/userService";
 
 /**
  * REGISTER REPOSITORIES
