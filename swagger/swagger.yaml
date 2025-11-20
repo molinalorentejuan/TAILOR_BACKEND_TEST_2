@@ -1,0 +1,663 @@
+openapi: 3.0.0
+info:
+  title: Tailor Restaurants API
+  version: "1.0.0"
+  description: |
+    Restaurants API challenge for Tailor.
+    Authentication via JWT Bearer tokens.
+servers:
+  - url: http://localhost:3000
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [USER, ADMIN]
+
+    AuthRequest:
+      type: object
+      required:
+        - email
+        - password
+        - name
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+        name:
+          type: string
+          minLength: 6
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+
+    Restaurant:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        cuisine:
+          type: string
+          nullable: true
+        neighborhood:
+          type: string
+          nullable: true
+        rating:
+          type: number
+          format: float
+
+    RestaurantCreate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        cuisine:
+          type: string
+          nullable: true
+        neighborhood:
+          type: string
+          nullable: true
+        rating:
+          type: number
+          format: float
+          nullable: true
+
+    RestaurantUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        cuisine:
+          type: string
+        neighborhood:
+          type: string
+        rating:
+          type: number
+          format: float
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+        restaurantId:
+          type: integer
+        userId:
+          type: integer
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    ReviewWithUserEmail:
+      allOf:
+        - $ref: '#/components/schemas/Review'
+        - type: object
+          properties:
+            userEmail:
+              type: string
+              format: email
+
+    UserReviewWithRestaurant:
+      type: object
+      properties:
+        id:
+          type: integer
+        restaurantId:
+          type: integer
+        rating:
+          type: integer
+        comment:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        restaurantName:
+          type: string
+
+    ReviewCreate:
+      type: object
+      required:
+        - rating
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          nullable: true
+
+    ReviewUpdate:
+      type: object
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          nullable: true
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+
+    RestaurantsListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Restaurant'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    StatsResponse:
+      type: object
+      properties:
+        usersCount:
+          type: integer
+        reviewsCount:
+          type: integer
+        restaurantsCount:
+          type: integer
+        topRated:
+          type: array
+          items:
+            $ref: '#/components/schemas/Restaurant'
+        mostReviewed:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              reviews:
+                type: integer
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      tags: [System]
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Email already used or invalid payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      summary: Login with email and password
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: Logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid credentials or invalid payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /restaurants:
+    get:
+      summary: List restaurants with pagination, filters and sorting
+      tags: [Restaurants]
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - in: query
+          name: cuisine
+          schema:
+            type: string
+        - in: query
+          name: rating
+          description: Minimum rating
+          schema:
+            type: number
+        - in: query
+          name: neighborhood
+          schema:
+            type: string
+        - in: query
+          name: sort
+          description: >
+            Sort by field and direction. Format: field:direction.
+            Valid fields: name, rating, cuisine, neighborhood.
+            Example: name:asc, rating:desc
+          schema:
+            type: string
+            example: name:asc
+      responses:
+        '200':
+          description: List of restaurants
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantsListResponse'
+
+    post:
+      summary: Create a new restaurant (ADMIN only)
+      tags: [Admin Restaurants]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestaurantCreate'
+      responses:
+        '201':
+          description: Restaurant created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden (not an admin)
+
+  /restaurants/{id}:
+    get:
+      summary: Get restaurant by id
+      tags: [Restaurants]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Restaurant found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+        '404':
+          description: Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Update a restaurant (ADMIN only)
+      tags: [Admin Restaurants]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestaurantUpdate'
+      responses:
+        '200':
+          description: Restaurant updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden (not an admin)
+        '404':
+          description: Restaurant not found
+
+    delete:
+      summary: Delete a restaurant (ADMIN only)
+      tags: [Admin Restaurants]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Restaurant deleted
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden (not an admin)
+
+  /restaurants/{id}/reviews:
+    get:
+      summary: List reviews for a restaurant
+      tags: [Reviews]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of reviews for the restaurant
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReviewWithUserEmail'
+        '404':
+          description: Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: Create a review for a restaurant
+      tags: [Reviews]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewCreate'
+      responses:
+        '201':
+          description: Review created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+        '400':
+          description: Invalid payload
+        '401':
+          description: Unauthorized
+        '404':
+          description: Restaurant not found
+
+  /me:
+    get:
+      summary: Get current authenticated user
+      tags: [Me]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+
+  /me/reviews:
+    get:
+      summary: Get reviews created by the authenticated user
+      tags: [Me]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of reviews by current user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserReviewWithRestaurant'
+        '401':
+          description: Unauthorized
+
+  /me/reviews/{id}:
+    put:
+      summary: Edit a review owned by the authenticated user
+      tags: [Me]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewUpdate'
+      responses:
+        '200':
+          description: Review updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Review not found or not owned by user
+
+    delete:
+      summary: Delete a review owned by the authenticated user
+      tags: [Me]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Review deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Review not found or not owned by user
+
+  /me/favorites:
+    get:
+      summary: List favorites of the authenticated user
+      tags: [Favorites]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of favorite restaurants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Restaurant'
+        '401':
+          description: Unauthorized
+
+  /me/favorites/{restaurantId}:
+    post:
+      summary: Add a restaurant to favorites
+      tags: [Favorites]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: restaurantId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Restaurant added to favorites (idempotent)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Restaurant not found
+
+    delete:
+      summary: Remove a restaurant from favorites
+      tags: [Favorites]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: restaurantId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Favorite removed
+        '401':
+          description: Unauthorized
+
+  /admin/stats:
+    get:
+      summary: Get global statistics (ADMIN only)
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden (not an admin)

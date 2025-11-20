@@ -1,0 +1,29 @@
+DI es parte del bootstrap de la app → no de la capa de datos.
+
+⭐ ¿Dónde van los DTOs REALMENTE?
+
+❌ No van en los services
+
+Los services trabajan con tipos internos del dominio, no con DTOs.
+
+✔ Los DTOs se usan en las ROUTES
+
+Para validar lo que llega del cliente.
+ ¿Por qué no usar DTO en los services?
+
+Porque el service no debe depender de la forma en que llega el request.
+
+Un DTO es un contrato externo.
+El service debe usar entidades internas limpias.
+
+Esto es Domain Driven Design básico.
+
+💡 ¿Cuándo se usa realmente un DTO de salida?
+
+Solo cuando:
+	•	quieres normalizar TODAS las respuestas
+	•	quieres evitar campos sensibles (password)
+	•	quieres garantizar formato inmutable para clients externos
+	•	estás construyendo una API pública o microservicio
+
+Pero para esta prueba técnica, meterlo ahora → NO suma puntos + y sí te complica la vida.
