@@ -23,7 +23,7 @@ RUN addgroup --system appgroup && adduser --system appuser --ingroup appgroup
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY swagger ./swagger
-COPY src/db/restaurants.db ./restaurants.db
+COPY src/db/restaurants.db ./dist/db/restaurants.db
 
 ENV NODE_ENV=production
 ENV PORT=3000
