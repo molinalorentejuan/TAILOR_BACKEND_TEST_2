@@ -3,23 +3,19 @@ import { Router } from "express";
 import { authMiddleware, roleMiddleware, AuthRequest } from "../middleware/auth";
 import { validateBody, validateParams } from "../middleware/validate";
 import { invalidateCache } from "../middleware/cache";
-import {
-  CreateRestaurantDTO,
-  UpdateRestaurantDTO,
-} from "../dto/restaurantDTO";
+import { CreateRestaurantDTO, UpdateRestaurantDTO } from "../dto/restaurantDTO";
+import { z } from "zod";
+
 import { container } from "../container";
 import { RestaurantAdminService } from "../services/restaurantAdminService";
 
 const router = Router();
 const adminService = container.resolve(RestaurantAdminService);
 
-const IdParamDTO = UpdateRestaurantDTO.extend({
-  id: undefined
-}); // placeholder, pero usamos otro DTO abajo
-
-const IdDTO = {
-  id: (z) => z.coerce.number().int().positive(),
-};
+// DTO simple para :id
+const IdParamDTO = z.object({
+  id: z.coerce.number().int().positive(),
+});
 
 /**
  * POST /admin/restaurants
@@ -31,9 +27,9 @@ router.post(
   validateBody(CreateRestaurantDTO),
   (req: AuthRequest, res, next) => {
     try {
-      const id = adminService.createRestaurant(req.body);
+      const result = adminService.createRestaurant(req.body);
       invalidateCache();
-      res.status(201).json(id);
+      return res.status(201).json(result);
     } catch (err) {
       next(err);
     }
@@ -47,18 +43,14 @@ router.put(
   "/:id",
   authMiddleware,
   roleMiddleware(["ADMIN"]),
-  validateParams(
-    // id: number
-    require("zod").object({
-      id: require("zod").coerce.number().int().positive(),
-    })
-  ),
+  validateParams(IdParamDTO),
   validateBody(UpdateRestaurantDTO),
   (req: AuthRequest, res, next) => {
     try {
-      adminService.updateRestaurant(req.params.id, req.body);
+      const id = Number(req.params.id);
+      adminService.updateRestaurant(id, req.body);
       invalidateCache();
-      res.json({ message: "Restaurant updated" });
+      return res.json({ message: "Restaurant updated" });
     } catch (err) {
       next(err);
     }
@@ -72,16 +64,13 @@ router.delete(
   "/:id",
   authMiddleware,
   roleMiddleware(["ADMIN"]),
-  validateParams(
-    require("zod").object({
-      id: require("zod").coerce.number().int().positive(),
-    })
-  ),
+  validateParams(IdParamDTO),
   (req: AuthRequest, res, next) => {
     try {
-      adminService.deleteRestaurant(req.params.id);
+      const id = Number(req.params.id);
+      adminService.deleteRestaurant(id);
       invalidateCache();
-      res.status(204).send();
+      return res.status(204).send();
     } catch (err) {
       next(err);
     }

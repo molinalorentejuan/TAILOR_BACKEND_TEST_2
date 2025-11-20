@@ -1,3 +1,4 @@
+// src/routes/admin.ts
 import { Router } from "express";
 import { authMiddleware, roleMiddleware } from "../middleware/auth";
 import { container } from "../container";
@@ -16,7 +17,7 @@ router.get(
   (req, res, next) => {
     try {
       const stats = adminService.getAdminStats();
-      res.json(stats);
+      return res.json(stats);
     } catch (err) {
       next(err);
     }

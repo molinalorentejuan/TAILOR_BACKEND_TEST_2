@@ -48,13 +48,13 @@ router.put(
   validateBody(UpdateReviewDTO),
   (req: AuthRequest, res, next) => {
     try {
-      const { id } = req.params;
+      const reviewId = Number(req.params.id);
       const { rating, comment } = req.body;
 
       userService.updateUserReview(
-        { id: Number(id) },        // params
-        { rating, comment },       // data
-        req.user!.id               // context
+        { id: reviewId },
+        { rating, comment },
+        req.user!.id
       );
 
       invalidateCache();
@@ -74,12 +74,9 @@ router.delete(
   validateParams(ReviewIdParamDTO),
   (req: AuthRequest, res, next) => {
     try {
-      const { id } = req.params;
+      const reviewId = Number(req.params.id);
 
-      userService.deleteUserReview(
-        { id: Number(id) },        // params (CORREGIDO)
-        req.user!.id               // context
-      );
+      userService.deleteUserReview({ id: reviewId }, req.user!.id);
 
       invalidateCache();
       return res.status(204).send();
@@ -98,9 +95,9 @@ router.post(
   validateParams(FavoriteParamsDTO),
   (req: AuthRequest, res, next) => {
     try {
-      const { restaurantId } = req.params;
+      const restaurantId = Number(req.params.restaurantId);
 
-      userService.addFavorite(req.user!.id, Number(restaurantId));
+      userService.addFavorite(req.user!.id, restaurantId);
 
       invalidateCache();
       return res.status(201).json({ message: "Favorite added" });
@@ -119,9 +116,9 @@ router.delete(
   validateParams(FavoriteParamsDTO),
   (req: AuthRequest, res, next) => {
     try {
-      const { restaurantId } = req.params;
+      const restaurantId = Number(req.params.restaurantId);
 
-      userService.removeFavorite(req.user!.id, Number(restaurantId));
+      userService.removeFavorite(req.user!.id, restaurantId);
 
       invalidateCache();
       return res.status(204).send();

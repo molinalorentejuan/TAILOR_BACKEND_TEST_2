@@ -9,10 +9,10 @@ import {
 } from "../middleware/validate";
 import {
   RestaurantsQueryDTO,
-  CreateRestaurantDTO,
-  RestaurantsQueryInput
+  CreateReviewDTO,
+  CreateRestaurantDTO, // Solo para admin pero no molesta aquí
 } from "../dto/restaurantDTO";
-import { CreateReviewDTO, ReviewIdParamDTO } from "../dto/reviewDTO";
+import { ReviewIdParamDTO } from "../dto/reviewDTO";
 import { container } from "../container";
 import { RestaurantService } from "../services/restaurantService";
 
@@ -28,9 +28,8 @@ router.get(
   cacheMiddleware,
   (req, res, next) => {
     try {
-      const result = restaurantService.listRestaurants(
-        req.query as RestaurantsQueryInput   // FIX
-      );
+      const query = req.query as any; // Zod ya lo validó
+      const result = restaurantService.listRestaurants(query);
       return res.json(result);
     } catch (err) {
       next(err);
@@ -47,8 +46,8 @@ router.get(
   cacheMiddleware,
   (req, res, next) => {
     try {
-      const { id } = req.params;
-      const restaurant = restaurantService.getRestaurantById(Number(id)); // FIX
+      const id = Number(req.params.id);
+      const restaurant = restaurantService.getRestaurantById(id);
       return res.json(restaurant);
     } catch (err) {
       next(err);
@@ -65,8 +64,8 @@ router.get(
   cacheMiddleware,
   (req, res, next) => {
     try {
-      const { id } = req.params;
-      const reviews = restaurantService.listReviewsForRestaurant(Number(id)); // FIX
+      const id = Number(req.params.id);
+      const reviews = restaurantService.listReviewsForRestaurant(id);
       return res.json(reviews);
     } catch (err) {
       next(err);
@@ -84,12 +83,12 @@ router.post(
   validateBody(CreateReviewDTO),
   (req: AuthRequest, res, next) => {
     try {
-      const { id } = req.params;
+      const restaurantId = Number(req.params.id);
       const { rating, comment } = req.body;
 
       const result = restaurantService.createReviewForRestaurant({
         userId: req.user!.id,
-        restaurantId: Number(id),   // FIX
+        restaurantId,
         rating,
         comment,
       });

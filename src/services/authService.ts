@@ -1,8 +1,8 @@
-// src/services/AuthService.ts
+// src/services/authService.ts
 import bcrypt from "bcryptjs";
 import { injectable, inject } from "tsyringe";
 import { signToken } from "../utils/jwt";
-import { AuthRepository, DBUser } from "../repositories/authRepository";
+import { AuthRepository } from "../repositories/authRepository";
 import { AppError } from "../errors/appError";
 import { RegisterInput, LoginInput } from "../dto/authDTO";
 
@@ -13,10 +13,7 @@ export class AuthService {
     private authRepo: AuthRepository
   ) {}
 
-  /**
-   * Registro de usuario usando RegisterDTO ya validado.
-   */
-  registerUser(data: RegisterInput ): string {
+  registerUser(data: RegisterInput): string {
     const { email, password, name } = data;
 
     if (this.authRepo.emailExists(email)) {
@@ -36,9 +33,6 @@ export class AuthService {
     return signToken({ id: user.id, role: user.role });
   }
 
-  /**
-   * Login usando LoginDTO ya validado.
-   */
   loginUser(data: LoginInput) {
     const { email, password } = data;
 

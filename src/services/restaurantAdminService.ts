@@ -1,8 +1,12 @@
+// src/services/restaurantAdminService.ts
 import { injectable, inject } from "tsyringe";
 import { RestaurantAdminRepository } from "../repositories/restaurantAdminRepository";
 import { OperatingHoursRepository } from "../repositories/operatingHoursRepository";
 import { AppError } from "../errors/appError";
-import { CreateRestaurantInput, UpdateRestaurantInput } from "../dto/restaurantDTO";
+import {
+  CreateRestaurantInput,
+  UpdateRestaurantInput,
+} from "../dto/restaurantDTO";
 
 @injectable()
 export class RestaurantAdminService {
@@ -24,7 +28,7 @@ export class RestaurantAdminService {
       lat,
       lng,
       image,
-      hours
+      hours,
     } = data;
 
     const id = this.repo.insertRestaurant(
@@ -63,7 +67,7 @@ export class RestaurantAdminService {
       lat,
       lng,
       image,
-      hours
+      hours,
     } = data;
 
     this.repo.updateRestaurant(
