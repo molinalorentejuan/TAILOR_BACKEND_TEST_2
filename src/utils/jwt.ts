@@ -1,16 +1,9 @@
-// src/utils/jwt.ts
 import "dotenv/config";
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { AppError } from "../errors/appError";
 
-const JWT_SECRET = process.env.JWT_SECRET;
-const EXPIRES_IN = process.env.JWT_EXPIRES_IN ?? "7d";
-
-if (!JWT_SECRET) {
-  console.warn(
-    "[WARN] JWT_SECRET is missing. Using insecure fallback key (DEV only)"
-  );
-}
+const JWT_SECRET = process.env.JWT_SECRET || "dev_fallback_key";
+const EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
 
 /**
  * Payload tipado
@@ -26,7 +19,7 @@ export interface JwtPayload {
  * Firmar token (PRO)
  */
 export function signToken(payload: Pick<JwtPayload, "id" | "role">): string {
-  return jwt.sign(payload, JWT_SECRET ?? "dev_fallback_key", {
+  return jwt.sign(payload, JWT_SECRET, {
     expiresIn: EXPIRES_IN,
   });
 }
@@ -36,7 +29,7 @@ export function signToken(payload: Pick<JwtPayload, "id" | "role">): string {
  */
 export function verifyToken(token: string): JwtPayload {
   try {
-    return jwt.verify(token, JWT_SECRET ?? "dev_fallback_key") as JwtPayload;
+    return jwt.verify(token, JWT_SECRET) as JwtPayload;
   } catch (err) {
     if (err instanceof TokenExpiredError) {
       throw new AppError("Token expired", 401, "TOKEN_EXPIRED");

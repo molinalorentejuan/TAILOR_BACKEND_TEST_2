@@ -9,7 +9,7 @@ import { AppError } from "../errors/appError";
 import {
   UpdateReviewInput,
   ReviewIdParamInput,
-} from "../dto/ReviewDTO";
+} from "../dto/reviewDTO";
 
 @injectable()
 export class UserService {
