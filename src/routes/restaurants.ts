@@ -9,10 +9,9 @@ import {
 } from "../middleware/validate";
 import {
   RestaurantsQueryDTO,
-  CreateReviewDTO,
   CreateRestaurantDTO, // Solo para admin pero no molesta aquí
 } from "../dto/restaurantDTO";
-import { ReviewIdParamDTO } from "../dto/reviewDTO";
+import { CreateReviewDTO, ReviewIdParamDTO } from "../dto/reviewDTO";
 import { container } from "../container";
 import { RestaurantService } from "../services/restaurantService";
 
