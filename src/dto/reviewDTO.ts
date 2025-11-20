@@ -5,8 +5,8 @@ import { z } from "zod";
  * Cuando un usuario crea una review (POST /restaurants/:id/reviews)
  */
 export const CreateReviewDTO = z.object({
-      restaurant_id: z.coerce.number().int().positive(),
-      user_id: z.coerce.number().int().positive(),
+  restaurant_id: z.coerce.number().int().positive(),
+  user_id: z.coerce.number().int().positive(),
   rating: z.number().int().min(1).max(5),
   comment: z.string().optional(),
 });
