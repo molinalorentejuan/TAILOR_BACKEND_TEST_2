@@ -26,7 +26,6 @@ COPY swagger ./swagger
 COPY src/db/restaurants.db ./dist/db/restaurants.db
 
 ENV NODE_ENV=production
-ENV PORT=3000
 
 EXPOSE 3000
 USER appuser
