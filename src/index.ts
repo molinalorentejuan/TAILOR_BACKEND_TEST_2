@@ -19,7 +19,7 @@ import path from 'path';
 import db from "./db/db";
 
 const app = express();
-
+app.set("trust proxy", 1);
 app.use(cors({
   origin: "*", // REVISAR
   methods: ["GET", "POST", "PUT", "DELETE"],
