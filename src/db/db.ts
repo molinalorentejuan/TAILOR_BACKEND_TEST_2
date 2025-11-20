@@ -1,16 +1,25 @@
 import Database from "better-sqlite3";
-import fs from "fs";
 import path from "path";
+import fs from "fs";
 
-const db = new Database("src/db/restaurants.db");
+// Ruta real en producción (dist/db/restaurants.db)
+const dbPath = path.join(__dirname, "restaurants.db");
+
+// Si no existe la carpeta dist/db en producción, la creamos
+const dir = path.dirname(dbPath);
+if (!fs.existsSync(dir)) {
+  fs.mkdirSync(dir, { recursive: true });
+}
+
+// Abrimos la base de datos *en dist*
+const db = new Database(dbPath);
+
+// Foreign keys ON
 db.pragma("foreign_keys = ON");
 
-// --- 2) AÑADIR COLUMNA
+// Intentamos añadir rating si no existe
 try {
   db.exec(`ALTER TABLE restaurants ADD COLUMN rating REAL DEFAULT 0;`);
-  console.log("[DB] Column 'rating' added to restaurants");
-} catch {
-  // ya existe → no pasa nada
-}
+} catch {}
 
 export default db;
