@@ -4,8 +4,10 @@ import { RestaurantRepository } from "../repositories/restaurantRepository";
 import { ReviewRepository } from "../repositories/reviewRepository";
 import { AppError } from "../errors/appError";
 
-import { RestaurantsQueryInput } from "../dto/restaurantDTO";
-import { CreateReviewInput } from "../dto/reviewDTO";
+import {
+  RestaurantsQueryInput,
+  CreateReviewInput,
+} from "../dto/restaurantDTO";
 import { UpdateReviewInput } from "../dto/reviewDTO";
 
 @injectable()
