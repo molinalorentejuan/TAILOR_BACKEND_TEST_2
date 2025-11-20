@@ -1,7 +1,7 @@
 // src/utils/jwt.ts
 import "dotenv/config";
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
-import { AppError } from "../errors/AppError";
+import { AppError } from "../errors/appError";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const EXPIRES_IN = process.env.JWT_EXPIRES_IN ?? "7d";
