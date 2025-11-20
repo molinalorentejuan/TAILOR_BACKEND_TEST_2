@@ -20,7 +20,7 @@ export class RestaurantAdminService {
   createRestaurant(data: CreateRestaurantInput) {
     const {
       name,
-      cuisine,
+      cuisine_type,
       rating = 0,
       neighborhood,
       address,
@@ -59,7 +59,7 @@ export class RestaurantAdminService {
 
     const {
       name,
-      cuisine,
+      cuisine_type,
       rating,
       neighborhood,
       address,

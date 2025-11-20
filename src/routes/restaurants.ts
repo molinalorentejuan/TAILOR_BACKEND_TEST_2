@@ -86,7 +86,7 @@ router.post(
       const { rating, comment } = req.body;
 
       const result = restaurantService.createReviewForRestaurant({
-        user_id: req.user!.id,
+        userId: req.user!.id,
         restaurantId,
         rating,
         comment,

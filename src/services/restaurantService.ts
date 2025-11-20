@@ -91,7 +91,7 @@ export class RestaurantService {
    * Crear review (DTO ya validado)
    */
   createReviewForRestaurant(input: CreateReviewInput) {
-    const { userId, restaurantId, rating, comment } = input;
+    const { user_id, restaurant_id, rating, comment } = input;
 
     const exists = this.restaurantRepo.findRestaurantById(restaurantId);
     if (!exists) {
@@ -100,8 +100,8 @@ export class RestaurantService {
 
     // columnas reales: user_id, restaurant_id, rating, comments
     const info = this.reviewRepo.insertReview(
-      userId,
-      restaurantId,
+      user_id,
+      restaurant_id,
       rating,
       comment
     );
@@ -112,18 +112,5 @@ export class RestaurantService {
       rating,
       comment,
     };
-  }
-
-  /**
-   * Actualizar review
-   */
-  updateReviewForRestaurant(reviewId: number, data: UpdateReviewInput) {
-    const existing = this.reviewRepo.findReviewById(reviewId);
-    if (!existing) {
-      throw new AppError("Review not found", 404, "REVIEW_NOT_FOUND");
-    }
-
-    this.reviewRepo.updateReview(reviewId, data.rating, data.comment ?? null);
-    return { reviewId };
   }
 }

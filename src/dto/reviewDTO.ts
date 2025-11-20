@@ -4,8 +4,12 @@ export const UpdateReviewDTO = z.object({
   rating: z.number().int().min(1).max(5),
   comment: z.string().optional(),
 });
-
-export const CreateReviewDTO = UpdateReviewDTO; // si lo necesitas
+export const UpdateReviewDTO = z.object(
+  restaurant_id: z.coerce.number().int().positive(),
+  user_id: z.coerce.number().int().positive(),
+  rating: z.number().int().min(1).max(5),
+  comment: z.string().optional(),
+});
 
 // PARAMS DTO para /me/reviews/:id
 export const ReviewIdParamDTO = z.object({
