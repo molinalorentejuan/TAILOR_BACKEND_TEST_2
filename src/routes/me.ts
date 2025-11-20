@@ -5,7 +5,7 @@ import { validateBody, validateParams } from "../middleware/validate";
 import {
   UpdateReviewDTO,
   ReviewIdParamDTO,
-} from "../dto/ReviewDTO";
+} from "../dto/reviewDTO";
 import { FavoriteParamsDTO } from "../dto/favoriteDTO";
 import { invalidateCache } from "../middleware/cache";
 import { container } from "../container";

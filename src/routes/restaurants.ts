@@ -10,7 +10,7 @@ import {
 import {
   RestaurantsQueryDTO,
   CreateRestaurantDTO,
-} from "../dto/RestaurantDTO";
+} from "../dto/restaurantDTO";
 import { CreateReviewDTO, ReviewIdParamDTO } from "../dto/reviewDTO";
 import { container } from "../container";
 import { RestaurantService } from "../services/restaurantService";
