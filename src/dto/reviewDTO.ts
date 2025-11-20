@@ -4,7 +4,7 @@ export const UpdateReviewDTO = z.object({
   rating: z.number().int().min(1).max(5),
   comment: z.string().optional(),
 });
-export const UpdateReviewDTO = z.object(
+export const CreateReviewDTO = z.object(
   restaurant_id: z.coerce.number().int().positive(),
   user_id: z.coerce.number().int().positive(),
   rating: z.number().int().min(1).max(5),
