@@ -1,4 +1,3 @@
-// src/services/RestaurantService.ts
 import { injectable, inject } from "tsyringe";
 import { RestaurantRepository } from "../repositories/restaurantRepository";
 import { ReviewRepository } from "../repositories/reviewRepository";

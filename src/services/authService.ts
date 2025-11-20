@@ -1,4 +1,3 @@
-// src/services/authService.ts
 import bcrypt from "bcryptjs";
 import { injectable, inject } from "tsyringe";
 import { signToken } from "../utils/jwt";

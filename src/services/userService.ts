@@ -1,4 +1,3 @@
-// src/services/userService.ts
 import { injectable, inject } from "tsyringe";
 import { UserRepository } from "../repositories/userRepository";
 import { ReviewRepository } from "../repositories/reviewRepository";
