@@ -46,7 +46,7 @@ export class UserService {
       throw new AppError("Review not found", 404, "REVIEW_NOT_FOUND");
     }
 
-    this.reviewRepo.updateReview(params.id, data.rating, data.comment ?? null);
+    this.reviewRepo.updateReview(params.id, data.rating, data.comment ?? undefined);
     return { id: params.id };
   }
 

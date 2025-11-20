@@ -20,7 +20,7 @@ export const RestaurantsQueryDTO = z.object({
 export const CreateRestaurantDTO = z.object({
   name: z.string(),
   neighborhood: z.string().optional(),
-  cuisine: z.string().optional(),
+  cuisine_type: z.string().optional(),
   rating: z.number().min(0).max(5).optional(),
   address: z.string().optional(),
   photograph: z.string().optional(),

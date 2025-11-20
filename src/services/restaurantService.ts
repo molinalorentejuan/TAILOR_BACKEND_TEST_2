@@ -4,11 +4,8 @@ import { RestaurantRepository } from "../repositories/restaurantRepository";
 import { ReviewRepository } from "../repositories/reviewRepository";
 import { AppError } from "../errors/appError";
 
-import {
-  RestaurantsQueryInput,
-  CreateReviewInput,
-} from "../dto/restaurantDTO";
-import { UpdateReviewInput } from "../dto/reviewDTO";
+import { RestaurantsQueryInput } from "../dto/restaurantDTO";
+import { UpdateReviewInput, CreateReviewInput } from "../dto/reviewDTO";
 
 @injectable()
 export class RestaurantService {
@@ -32,7 +29,7 @@ export class RestaurantService {
     // columna REAL en la DB
     if (cuisine_type) {
       where.push("cuisine_type = ?");
-      params.push(cuisine);
+      params.push(cuisine_type);
     }
 
     // rating lo añades tú con ALTER TABLE

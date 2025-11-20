@@ -14,4 +14,5 @@ export const ReviewIdParamDTO = z.object({
 
 // TYPES opcionales
 export type UpdateReviewInput = z.infer<typeof UpdateReviewDTO>;
+export type CreateReviewInput = z.infer<typeof CreateReviewDTO>;
 export type ReviewIdParamInput = z.infer<typeof ReviewIdParamDTO>;
