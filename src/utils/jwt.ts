@@ -15,11 +15,8 @@ export interface JwtPayload {
   exp?: number;
 }
 
-/**
- * Firmar token (PRO)
- */
 export function signToken(payload: Pick<JwtPayload, "id" | "role">): string {
-  return jwt.sign(payload, JWT_SECRET, {
+  return (jwt as any).sign(payload, JWT_SECRET ?? "dev_fallback_key", {
     expiresIn: EXPIRES_IN,
   });
 }
