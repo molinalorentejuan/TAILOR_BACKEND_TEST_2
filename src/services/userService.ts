@@ -4,7 +4,7 @@ import { ReviewRepository } from "../repositories/reviewRepository";
 import { FavoriteRepository } from "../repositories/favoriteRepository";
 import { RestaurantRepository } from "../repositories/restaurantRepository";
 import { AppError } from "../errors/appError";
-import { UpdateReviewParamsInput, ReviewIdParamInput } from "../dto/reviewDTO";
+import { UpdateReviewInput, ReviewParamsInput } from "../dto/reviewDTO";
 
 @injectable()
 export class UserService {
@@ -35,7 +35,7 @@ export class UserService {
   }
 
   updateUserReview(
-    params: ReviewIdParamInput,
+    params: ReviewParamsInput,
     data: UpdateReviewInput,
     userId: number
   ) {

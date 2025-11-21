@@ -18,7 +18,7 @@ import fs from 'fs';
 import path from 'path';
 import db from "./db/db";
 
-import { errorHandler } from "./middleware/errorHandler";
+import { errorHandler } from "./errors/errorHandler";
 
 const app = express();
 app.set("trust proxy", 1);

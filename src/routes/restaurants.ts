@@ -1,109 +1,103 @@
-// src/routes/me.ts
+// src/routes/restaurants.ts
 import { Router } from "express";
+import { cacheMiddleware, invalidateCache } from "../middleware/cache";
 import { authMiddleware, AuthRequest } from "../middleware/auth";
-import { validateBody, validateParams } from "../middleware/validate";
-import { UpdateReviewDTO, ReviewIdParamDTO } from "../dto/reviewDTO";
-import { FavoriteParamsDTO } from "../dto/favoriteDTO";
-import { invalidateCache } from "../middleware/cache";
+import {
+  validateQuery,
+  validateBody,
+  validateParams,
+} from "../middleware/validate";
+import {
+  RestaurantsQueryDTO,
+  CreateRestaurantDTO,
+} from "../dto/restaurantDTO";
+import { CreateReviewDTO, ReviewParamsDTO } from "../dto/reviewDTO";
 import { container } from "../container";
-import { UserService } from "../services/userService";
+import { RestaurantService } from "../services/restaurantService";
 
 const router = Router();
-const userService = container.resolve(UserService);
+const restaurantService = container.resolve(RestaurantService);
 
-// GET /me
-router.get("/", authMiddleware, (req: AuthRequest, res, next) => {
-  try {
-    const user = userService.getUserById(req.user!.id);
-    return res.json(user);
-  } catch (err) {
-    next(err);
-  }
-});
-
-// GET /me/reviews
-router.get("/reviews", authMiddleware, (req: AuthRequest, res, next) => {
-  try {
-    const rows = userService.listReviewsByUser(req.user!.id);
-    return res.json(rows);
-  } catch (err) {
-    next(err);
-  }
-});
-
-// PUT /me/reviews/:id
-router.put(
-  "/reviews/:id",
-  authMiddleware,
-  validateParams(ReviewIdParamDTO),
-  validateBody(UpdateReviewDTO),
-  (req: AuthRequest, res, next) => {
+/**
+ * GET /restaurants
+ */
+router.get(
+  "/",
+  validateQuery(RestaurantsQueryDTO),
+  cacheMiddleware,
+  (req, res, next) => {
     try {
-      userService.updateUserReview(req.params, req.body, req.user!.id);
-      invalidateCache();
-      return res.json({ message: "Review updated" });
+      const query = req.query as any; // Zod ya lo validó
+      const result = restaurantService.listRestaurants(query);
+      return res.json(result);
     } catch (err) {
       next(err);
     }
   }
 );
 
-// DELETE /me/reviews/:id
-router.delete(
-  "/reviews/:id",
-  authMiddleware,
-  validateParams(ReviewIdParamDTO),
-  (req: AuthRequest, res, next) => {
+/**
+ * GET /restaurants/:id
+ */
+router.get(
+  "/:id",
+  validateParams(ReviewParamsDTO),
+  cacheMiddleware,
+  (req, res, next) => {
     try {
-      userService.deleteUserReview(req.params, req.user!.id);
-      invalidateCache();
-      return res.status(204).send();
+      const id = Number(req.params.id);
+      const restaurant = restaurantService.getRestaurantById(id);
+      return res.json(restaurant);
     } catch (err) {
       next(err);
     }
   }
 );
 
-// POST /me/favorites/:restaurantId
+/**
+ * GET /restaurants/:id/reviews
+ */
+router.get(
+  "/:id/reviews",
+  validateParams(ReviewParamsDTO),
+  cacheMiddleware,
+  (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      const reviews = restaurantService.listReviewsForRestaurant(id);
+      return res.json(reviews);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+/**
+ * POST /restaurants/:id/reviews
+ */
 router.post(
-  "/favorites/:restaurantId",
+  "/:id/reviews",
   authMiddleware,
-  validateParams(FavoriteParamsDTO),
+  validateParams(ReviewParamsDTO),
+  validateBody(CreateReviewDTO),
   (req: AuthRequest, res, next) => {
     try {
-      userService.addFavorite(req.user!.id, Number(req.params.restaurantId));
+      const restaurant_id = Number(req.params.id);
+      const { rating, comment } = req.body;
+
+      const result = restaurantService.createReviewForRestaurant({
+        user_id: req.user!.id,
+        restaurant_id,
+        rating,
+        comment,
+      });
+
       invalidateCache();
-      return res.status(201).json({ message: "Favorite added" });
+      return res.status(201).json({ id: result.id });
     } catch (err) {
       next(err);
     }
   }
 );
-
-// DELETE /me/favorites/:restaurantId
-router.delete(
-  "/favorites/:restaurantId",
-  authMiddleware,
-  validateParams(FavoriteParamsDTO),
-  (req: AuthRequest, res, next) => {
-    try {
-      userService.removeFavorite(req.user!.id, Number(req.params.restaurantId));
-      invalidateCache();
-      return res.status(204).send();
-    } catch (err) {
-      next(err);
-    }
-  }
-);
-
-// GET /me/favorites
-router.get("/favorites", authMiddleware, (req: AuthRequest, res, next) => {
-  try {
-    const rows = userService.listFavoritesByUser(req.user!.id);
-    return res.json(rows);
-  } catch (err) {
-    next(err);
-  }
-});
 
 export default router;

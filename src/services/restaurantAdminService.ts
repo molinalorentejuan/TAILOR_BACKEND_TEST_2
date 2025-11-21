@@ -5,9 +5,10 @@ import { ReviewRepository } from "../repositories/reviewRepository";
 import { FavoriteRepository } from "../repositories/favoriteRepository";
 import db from "../db/db";
 import { AppError } from "../errors/appError";
+
 import {
-  CreateRestaurantParamsInput,
-  UpdateRestaurantParamsInput,
+  CreateRestaurantInput,
+  UpdateRestaurantInput,
 } from "../dto/restaurantDTO";
 
 @injectable()
@@ -15,15 +16,21 @@ export class RestaurantAdminService {
   constructor(
     @inject(RestaurantAdminRepository)
     private repo: RestaurantAdminRepository,
+
     @inject(OperatingHoursRepository)
     private hoursRepo: OperatingHoursRepository,
+
     @inject(ReviewRepository)
     private reviewRepo: ReviewRepository,
+
     @inject(FavoriteRepository)
-    private favoriteRepo: FavoriteRepository,
+    private favoriteRepo: FavoriteRepository
   ) {}
 
-  createRestaurant(data: CreateRestaurantParamsInput) {
+  /**
+   * CREATE
+   */
+  createRestaurant(data: CreateRestaurantInput) {
     const {
       name,
       cuisine_type,
@@ -38,6 +45,7 @@ export class RestaurantAdminService {
     } = data;
 
     const tx = db.transaction(() => {
+      // INSERT restaurant
       const id = this.repo.insertRestaurant(
         name,
         neighborhood ?? null,
@@ -50,6 +58,7 @@ export class RestaurantAdminService {
         image ?? null
       );
 
+      // INSERT hours
       if (hours && hours.length > 0) {
         for (const h of hours) {
           this.hoursRepo.insertHours(id, h.day, h.hours);
@@ -63,7 +72,10 @@ export class RestaurantAdminService {
     return { id };
   }
 
-  updateRestaurant(id: number, data: UpdateRestaurantParamsInput) {
+  /**
+   * UPDATE
+   */
+  updateRestaurant(id: number, data: UpdateRestaurantInput) {
     if (!this.repo.restaurantExists(id)) {
       throw new AppError("Restaurant not found", 404, "RESTAURANT_NOT_FOUND");
     }
@@ -81,6 +93,7 @@ export class RestaurantAdminService {
       hours,
     } = data;
 
+    // UPDATE base fields
     this.repo.updateRestaurant(
       id,
       name ?? null,
@@ -94,10 +107,11 @@ export class RestaurantAdminService {
       image ?? null
     );
 
+    // UPDATE hours in transaction
     const tx = db.transaction(() => {
       this.hoursRepo.deleteForRestaurant(id);
 
-      if (hours !== undefined) {
+      if (hours && hours.length > 0) {
         for (const h of hours) {
           this.hoursRepo.insertHours(id, h.day, h.hours);
         }
@@ -108,6 +122,9 @@ export class RestaurantAdminService {
     return { id };
   }
 
+  /**
+   * DELETE
+   */
   deleteRestaurant(id: number) {
     if (!this.repo.restaurantExists(id)) {
       throw new AppError("Restaurant not found", 404, "RESTAURANT_NOT_FOUND");
@@ -121,7 +138,6 @@ export class RestaurantAdminService {
     });
 
     tx();
-
     return { id };
   }
 }
