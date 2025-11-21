@@ -5,6 +5,7 @@ import { AppError } from "../errors/appError";
 
 import { RestaurantsQueryInput } from "../dto/restaurantDTO";
 import { UpdateReviewInput, CreateReviewInput } from "../dto/reviewDTO";
+import { CreateReviewServiceInput } from "../types";
 
 @injectable()
 export class RestaurantService {
@@ -89,7 +90,7 @@ export class RestaurantService {
   /**
    * Crear review (DTO ya validado)
    */
-  createReviewForRestaurant(input: CreateReviewInput) {
+  createReviewForRestaurant(input: CreateReviewServiceInput) {
     const { user_id, restaurant_id, rating, comment } = input;
 
     const exists = this.restaurantRepo.findRestaurantById(restaurant_id);

@@ -28,4 +28,4 @@ export const ReviewIdParamDTO = z.object({
  */
 export type CreateReviewInput = z.infer<typeof CreateReviewDTO>;
 export type UpdateReviewInput = z.infer<typeof UpdateReviewDTO>;
-export type ReviewIdParamInput = z.infer<typeof ReviewIdParamDTO>;s
+export type ReviewIdParamInput = z.infer<typeof ReviewIdParamDTO>;
