@@ -22,7 +22,6 @@ RUN addgroup --system appgroup && adduser --system appuser --ingroup appgroup
 
 # Creamos carpeta writable donde irá la DB
 RUN mkdir -p /app/data && chown -R appuser:appgroup /app/data
-
 # Copiamos build
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
