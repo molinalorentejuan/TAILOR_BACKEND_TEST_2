@@ -7,23 +7,27 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-RUN npm run build   # esto crea dist/ + copia la DB en dist/db/
+RUN npm run build   # produce dist/ + copia la DB a dist/db/
 
 # ----------- Runtime -----------
 FROM node:20-slim AS runner
 
 WORKDIR /app
 
-# Healthcheck tools
 RUN apt-get update && apt-get install -y curl && apt-get clean
 
-# Usuario seguro
 RUN addgroup --system appgroup && adduser --system appuser --ingroup appgroup
 
-# Copiamos build completo (incluye dist/db/restaurants.db)
+# Crear carpeta writable
+RUN mkdir -p /app/data && chown -R appuser:appgroup /app/data
+
+# Copiar build
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY swagger ./swagger
+
+# Copiar base de datos real al sitio donde db.ts la busca
+COPY --from=builder /app/dist/db/restaurants.db /app/data/restaurants.db
 
 ENV NODE_ENV=production
 ENV PORT=3000
