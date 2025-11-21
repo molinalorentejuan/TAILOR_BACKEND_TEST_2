@@ -1,36 +1,30 @@
-# ---------- Etapa 1: Build ----------
+# ----------- Build -----------
 FROM node:20 AS builder
 
 WORKDIR /app
-
 COPY package*.json ./
 RUN npm install
-
 COPY . .
 RUN npm run build
 
-
-# ---------- Etapa 2: Runtime ----------
+# ----------- Runtime -----------
 FROM node:20-slim AS runner
 
 WORKDIR /app
 
-# Instalar curl para healthcheck
+# Instalar curl para healthchecks
 RUN apt-get update && apt-get install -y curl && apt-get clean
 
 # Usuario seguro
 RUN addgroup --system appgroup && adduser --system appuser --ingroup appgroup
 
-# Crear carpeta de datos (DB) y dar permisos
+# Carpeta writable para SQLite
 RUN mkdir -p /app/data && chown -R appuser:appgroup /app/data
 
-# Copiar archivos necesarios
-COPY --from=builder /app/node_modules ./node_modules
+# Copiar build
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
 COPY swagger ./swagger
-
-# Copiar base de datos al directorio de datos WRITABLE
-COPY src/db/restaurants.db /app/data/restaurants.db
 
 ENV NODE_ENV=production
 ENV PORT=3000
