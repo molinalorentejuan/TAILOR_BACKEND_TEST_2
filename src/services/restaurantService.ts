@@ -5,7 +5,7 @@ import { AppError } from "../errors/appError";
 
 import { RestaurantsQueryInput } from "../dto/restaurantDTO";
 import { UpdateReviewInput, CreateReviewInput } from "../dto/reviewDTO";
-import { CreateReviewServiceInput } from "../types";
+import { CreateReviewServiceInput } from "../types/types";
 
 @injectable()
 export class RestaurantService {
