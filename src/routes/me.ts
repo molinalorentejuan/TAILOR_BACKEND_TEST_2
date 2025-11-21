@@ -4,7 +4,7 @@ import { authMiddleware, AuthRequest } from "../middleware/auth";
 import { validateBody, validateParams } from "../middleware/validate";
 import {
   UpdateReviewDTO,
-  ReviewIdParamDTO,
+  ReviewParamsDTO,
 } from "../dto/reviewDTO";
 import { FavoriteParamsDTO } from "../dto/favoriteDTO";
 import { invalidateCache } from "../middleware/cache";
@@ -44,7 +44,7 @@ router.get("/reviews", authMiddleware, (req: AuthRequest, res, next) => {
 router.put(
   "/reviews/:id",
   authMiddleware,
-  validateParams(ReviewIdParamDTO),
+  validateParams(ReviewParamsDTO),
   validateBody(UpdateReviewDTO),
   (req: AuthRequest, res, next) => {
     try {
@@ -71,7 +71,7 @@ router.put(
 router.delete(
   "/reviews/:id",
   authMiddleware,
-  validateParams(ReviewIdParamDTO),
+  validateParams(ReviewParamsDTO),
   (req: AuthRequest, res, next) => {
     try {
       const reviewId = Number(req.params.id);

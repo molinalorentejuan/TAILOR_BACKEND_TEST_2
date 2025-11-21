@@ -3,7 +3,7 @@ import { injectable, inject } from "tsyringe";
 import { signToken } from "../utils/jwt";
 import { AuthRepository } from "../repositories/authRepository";
 import { AppError } from "../errors/appError";
-import { RegisterInput, LoginInput } from "../dto/authDTO";
+import { RegisterParamsInput, LoginParamsInput } from "../dto/authDTO";
 
 @injectable()
 export class AuthService {
@@ -12,28 +12,35 @@ export class AuthService {
     private authRepo: AuthRepository
   ) {}
 
-  registerUser(data: RegisterInput): string {
-    const { email, password, name } = data;
+  registerUser(data: RegisterParamsInput): string {
+    const email = data.email.trim().toLowerCase();
+    const password = data.password.trim();
+    const name = data.name.trim();
 
     if (this.authRepo.emailExists(email)) {
       throw new AppError("Email already in use", 409, "EMAIL_IN_USE");
     }
 
     const hash = bcrypt.hashSync(password, 10);
-    const finalName = name.trim() || email.split("@")[0];
+    const finalName = name || email.split("@")[0];
 
     this.authRepo.createUser(finalName, email, hash);
 
     const user = this.authRepo.findUserBasic(email);
     if (!user) {
-      throw new AppError("User could not be created", 500, "USER_CREATION_FAILED");
+      throw new AppError(
+        "User could not be created",
+        500,
+        "USER_CREATION_FAILED"
+      );
     }
 
     return signToken({ id: user.id, role: user.role });
   }
 
-  loginUser(data: LoginInput) {
-    const { email, password } = data;
+  loginUser(data: LoginParamsInput) {
+    const email = data.email.trim().toLowerCase();
+    const password = data.password.trim();
 
     const user = this.authRepo.findUserByEmail(email);
     if (!user) {

@@ -5,7 +5,7 @@ const isProd = process.env.NODE_ENV === "production";
 
 const dbPath = isProd
   ? "/app/data/restaurants.db"
-  : path.join(__dirname, "db", "restaurants.db");
+  : path.join(process.cwd(), "src", "db", "restaurants.db");
 
 const db = new Database(dbPath);
 

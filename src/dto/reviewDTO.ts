@@ -1,16 +1,10 @@
 import { z } from "zod";
 
-/**
- * CREATE REVIEW – body correcto
- */
 export const CreateReviewDTO = z.object({
   rating: z.number().int().min(1).max(5),
   comment: z.string().optional(),
 });
 
-/**
- * UPDATE REVIEW
- */
 export const UpdateReviewDTO = z.object({
   rating: z.number().int().min(1).max(5),
   comment: z.string().optional(),
@@ -19,7 +13,7 @@ export const UpdateReviewDTO = z.object({
 /**
  * PARAMS :id
  */
-export const ReviewIdParamDTO = z.object({
+export const ReviewParamsDTO = z.object({
   id: z.coerce.number().int().positive(),
 });
 
@@ -28,4 +22,4 @@ export const ReviewIdParamDTO = z.object({
  */
 export type CreateReviewInput = z.infer<typeof CreateReviewDTO>;
 export type UpdateReviewInput = z.infer<typeof UpdateReviewDTO>;
-export type ReviewIdParamInput = z.infer<typeof ReviewIdParamDTO>;
+export type ReviewParamsInput = z.infer<typeof ReviewParamsDTO>;

@@ -1,103 +1,109 @@
-// src/routes/restaurants.ts
+// src/routes/me.ts
 import { Router } from "express";
-import { cacheMiddleware, invalidateCache } from "../middleware/cache";
 import { authMiddleware, AuthRequest } from "../middleware/auth";
-import {
-  validateQuery,
-  validateBody,
-  validateParams,
-} from "../middleware/validate";
-import {
-  RestaurantsQueryDTO,
-  CreateRestaurantDTO, // Solo para admin pero no molesta aquí
-} from "../dto/restaurantDTO";
-import { CreateReviewDTO, ReviewIdParamDTO } from "../dto/reviewDTO";
+import { validateBody, validateParams } from "../middleware/validate";
+import { UpdateReviewDTO, ReviewIdParamDTO } from "../dto/reviewDTO";
+import { FavoriteParamsDTO } from "../dto/favoriteDTO";
+import { invalidateCache } from "../middleware/cache";
 import { container } from "../container";
-import { RestaurantService } from "../services/restaurantService";
+import { UserService } from "../services/userService";
 
 const router = Router();
-const restaurantService = container.resolve(RestaurantService);
+const userService = container.resolve(UserService);
 
-/**
- * GET /restaurants
- */
-router.get(
-  "/",
-  validateQuery(RestaurantsQueryDTO),
-  cacheMiddleware,
-  (req, res, next) => {
-    try {
-      const query = req.query as any; // Zod ya lo validó
-      const result = restaurantService.listRestaurants(query);
-      return res.json(result);
-    } catch (err) {
-      next(err);
-    }
+// GET /me
+router.get("/", authMiddleware, (req: AuthRequest, res, next) => {
+  try {
+    const user = userService.getUserById(req.user!.id);
+    return res.json(user);
+  } catch (err) {
+    next(err);
   }
-);
+});
 
-/**
- * GET /restaurants/:id
- */
-router.get(
-  "/:id",
-  validateParams(ReviewIdParamDTO),
-  cacheMiddleware,
-  (req, res, next) => {
-    try {
-      const id = Number(req.params.id);
-      const restaurant = restaurantService.getRestaurantById(id);
-      return res.json(restaurant);
-    } catch (err) {
-      next(err);
-    }
+// GET /me/reviews
+router.get("/reviews", authMiddleware, (req: AuthRequest, res, next) => {
+  try {
+    const rows = userService.listReviewsByUser(req.user!.id);
+    return res.json(rows);
+  } catch (err) {
+    next(err);
   }
-);
+});
 
-/**
- * GET /restaurants/:id/reviews
- */
-router.get(
-  "/:id/reviews",
-  validateParams(ReviewIdParamDTO),
-  cacheMiddleware,
-  (req, res, next) => {
-    try {
-      const id = Number(req.params.id);
-      const reviews = restaurantService.listReviewsForRestaurant(id);
-      return res.json(reviews);
-    } catch (err) {
-      next(err);
-    }
-  }
-);
-
-/**
- * POST /restaurants/:id/reviews
- */
-router.post(
-  "/:id/reviews",
+// PUT /me/reviews/:id
+router.put(
+  "/reviews/:id",
   authMiddleware,
   validateParams(ReviewIdParamDTO),
-  validateBody(CreateReviewDTO),
+  validateBody(UpdateReviewDTO),
   (req: AuthRequest, res, next) => {
     try {
-      const restaurant_id = Number(req.params.id);
-      const { rating, comment } = req.body;
-
-      const result = restaurantService.createReviewForRestaurant({
-        user_id: req.user!.id,
-        restaurant_id,
-        rating,
-        comment,
-      });
-
+      userService.updateUserReview(req.params, req.body, req.user!.id);
       invalidateCache();
-      return res.status(201).json({ id: result.id });
+      return res.json({ message: "Review updated" });
     } catch (err) {
       next(err);
     }
   }
 );
+
+// DELETE /me/reviews/:id
+router.delete(
+  "/reviews/:id",
+  authMiddleware,
+  validateParams(ReviewIdParamDTO),
+  (req: AuthRequest, res, next) => {
+    try {
+      userService.deleteUserReview(req.params, req.user!.id);
+      invalidateCache();
+      return res.status(204).send();
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// POST /me/favorites/:restaurantId
+router.post(
+  "/favorites/:restaurantId",
+  authMiddleware,
+  validateParams(FavoriteParamsDTO),
+  (req: AuthRequest, res, next) => {
+    try {
+      userService.addFavorite(req.user!.id, Number(req.params.restaurantId));
+      invalidateCache();
+      return res.status(201).json({ message: "Favorite added" });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// DELETE /me/favorites/:restaurantId
+router.delete(
+  "/favorites/:restaurantId",
+  authMiddleware,
+  validateParams(FavoriteParamsDTO),
+  (req: AuthRequest, res, next) => {
+    try {
+      userService.removeFavorite(req.user!.id, Number(req.params.restaurantId));
+      invalidateCache();
+      return res.status(204).send();
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// GET /me/favorites
+router.get("/favorites", authMiddleware, (req: AuthRequest, res, next) => {
+  try {
+    const rows = userService.listFavoritesByUser(req.user!.id);
+    return res.json(rows);
+  } catch (err) {
+    next(err);
+  }
+});
 
 export default router;

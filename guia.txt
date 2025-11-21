@@ -27,3 +27,12 @@ Solo cuando:
 	•	estás construyendo una API pública o microservicio
 
 Pero para esta prueba técnica, meterlo ahora → NO suma puntos + y sí te complica la vida.
+
+
+⭐ ¿Por qué NO ponemos try/catch en cada operación SQL?
+
+Porque:
+	1.	better-sqlite3 lanza errores sincronamente (no promesas).
+	2.	Esos errores automáticamente suben al middleware errorHandler.
+	3.	El handler envuelve todo y devuelve mensaje + status + i18n.
+	4.	Repetir try/catch en todos los servicios ensucia y viola SRP.

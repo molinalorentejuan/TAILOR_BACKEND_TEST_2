@@ -3,7 +3,7 @@ import { Router } from "express";
 import { authMiddleware, roleMiddleware, AuthRequest } from "../middleware/auth";
 import { validateBody, validateParams } from "../middleware/validate";
 import { invalidateCache } from "../middleware/cache";
-import { CreateRestaurantDTO, UpdateRestaurantDTO } from "../dto/restaurantDTO";
+import { CreateRestaurantDTO, UpdateRestaurantDTO, RestaurantParamsDTO } from "../dto/restaurantDTO";
 import { z } from "zod";
 
 import { container } from "../container";
@@ -11,11 +11,6 @@ import { RestaurantAdminService } from "../services/restaurantAdminService";
 
 const router = Router();
 const adminService = container.resolve(RestaurantAdminService);
-
-// DTO simple para :id
-const IdParamDTO = z.object({
-  id: z.coerce.number().int().positive(),
-});
 
 /**
  * POST /admin/restaurants
@@ -43,7 +38,7 @@ router.put(
   "/:id",
   authMiddleware,
   roleMiddleware(["ADMIN"]),
-  validateParams(IdParamDTO),
+  validateParams(RestaurantParamsDTO),
   validateBody(UpdateRestaurantDTO),
   (req: AuthRequest, res, next) => {
     try {
@@ -64,7 +59,7 @@ router.delete(
   "/:id",
   authMiddleware,
   roleMiddleware(["ADMIN"]),
-  validateParams(IdParamDTO),
+  validateParams(RestaurantParamsDTO),
   (req: AuthRequest, res, next) => {
     try {
       const id = Number(req.params.id);

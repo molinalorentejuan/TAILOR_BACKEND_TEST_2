@@ -1,4 +1,3 @@
-// src/routes/auth.ts
 import { Router } from "express";
 import { validateBody } from "../middleware/validate";
 import { authRateLimiter } from "../middleware/rateLimit";

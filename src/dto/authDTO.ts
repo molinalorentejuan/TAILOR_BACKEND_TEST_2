@@ -11,5 +11,8 @@ export const LoginDTO = z.object({
   password: z.string().min(1),
 });
 
-export type RegisterInput = z.infer<typeof RegisterDTO>;
-export type LoginInput = z.infer<typeof LoginDTO>;
+/**
+ * TYPES
+ */
+export type RegisterParamsInput = z.infer<typeof RegisterDTO>;
+export type LoginParamsInput = z.infer<typeof LoginDTO>;

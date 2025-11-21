@@ -17,6 +17,9 @@ export const RestaurantsQueryDTO = z.object({
     .optional(),
 });
 
+/**
+ * CREATE RESTAURANT
+ */
 export const CreateRestaurantDTO = z.object({
   name: z.string(),
   neighborhood: z.string().optional(),
@@ -28,18 +31,27 @@ export const CreateRestaurantDTO = z.object({
   lng: z.number().optional(),
   image: z.string().optional(),
 
-  hours: z.array(
-    z.object({
-      day: z.string(),
-      hours: z.string()
-    })
-  ).optional()
+  hours: z
+    .array(
+      z.object({
+        day: z.string(),
+        hours: z.string(),
+      })
+    )
+    .optional(),
 });
 
 /**
- * UPDATE = opcional todo
+ * UPDATE (todos opcionales)
  */
 export const UpdateRestaurantDTO = CreateRestaurantDTO.partial();
+
+/**
+ * PARAMS :id
+ */
+export const RestaurantParamsDTO = z.object({
+  id: z.coerce.number().int().positive(),
+});
 
 /**
  * TYPES
@@ -47,3 +59,4 @@ export const UpdateRestaurantDTO = CreateRestaurantDTO.partial();
 export type RestaurantsQueryInput = z.infer<typeof RestaurantsQueryDTO>;
 export type CreateRestaurantInput = z.infer<typeof CreateRestaurantDTO>;
 export type UpdateRestaurantInput = z.infer<typeof UpdateRestaurantDTO>;
+export type RestaurantParamsInput = z.infer<typeof RestaurantParamsDTO>;

@@ -9,10 +9,6 @@ export class AdminService {
     private adminRepo: AdminRepository
   ) {}
 
-  /**
-   * Devuelve todas las métricas del panel admin.
-   * Lanza AppError si algo inesperado pasa.
-   */
   getAdminStats() {
     try {
       const usersCount = this.adminRepo.countUsers();

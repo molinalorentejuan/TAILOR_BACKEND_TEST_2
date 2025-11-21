@@ -1,10 +1,13 @@
 import { injectable, inject } from "tsyringe";
 import { RestaurantAdminRepository } from "../repositories/restaurantAdminRepository";
 import { OperatingHoursRepository } from "../repositories/operatingHoursRepository";
+import { ReviewRepository } from "../repositories/reviewRepository";
+import { FavoriteRepository } from "../repositories/favoriteRepository";
+import db from "../db/db";
 import { AppError } from "../errors/appError";
 import {
-  CreateRestaurantInput,
-  UpdateRestaurantInput,
+  CreateRestaurantParamsInput,
+  UpdateRestaurantParamsInput,
 } from "../dto/restaurantDTO";
 
 @injectable()
@@ -13,10 +16,14 @@ export class RestaurantAdminService {
     @inject(RestaurantAdminRepository)
     private repo: RestaurantAdminRepository,
     @inject(OperatingHoursRepository)
-    private hoursRepo: OperatingHoursRepository
+    private hoursRepo: OperatingHoursRepository,
+    @inject(ReviewRepository)
+    private reviewRepo: ReviewRepository,
+    @inject(FavoriteRepository)
+    private favoriteRepo: FavoriteRepository,
   ) {}
 
-  createRestaurant(data: CreateRestaurantInput) {
+  createRestaurant(data: CreateRestaurantParamsInput) {
     const {
       name,
       cuisine_type,
@@ -30,28 +37,33 @@ export class RestaurantAdminService {
       hours,
     } = data;
 
-    const id = this.repo.insertRestaurant(
-      name,
-      neighborhood ?? null,
-      cuisine_type ?? null,
-      rating,
-      address ?? null,
-      photograph ?? null,
-      lat ?? null,
-      lng ?? null,
-      image ?? null
-    );
+    const tx = db.transaction(() => {
+      const id = this.repo.insertRestaurant(
+        name,
+        neighborhood ?? null,
+        cuisine_type ?? null,
+        rating,
+        address ?? null,
+        photograph ?? null,
+        lat ?? null,
+        lng ?? null,
+        image ?? null
+      );
 
-    if (hours) {
-      for (const h of hours) {
-        this.hoursRepo.insertHours(id, h.day, h.hours);
+      if (hours && hours.length > 0) {
+        for (const h of hours) {
+          this.hoursRepo.insertHours(id, h.day, h.hours);
+        }
       }
-    }
 
+      return id;
+    });
+
+    const id = tx();
     return { id };
   }
 
-  updateRestaurant(id: number, data: UpdateRestaurantInput) {
+  updateRestaurant(id: number, data: UpdateRestaurantParamsInput) {
     if (!this.repo.restaurantExists(id)) {
       throw new AppError("Restaurant not found", 404, "RESTAURANT_NOT_FOUND");
     }
@@ -82,14 +94,17 @@ export class RestaurantAdminService {
       image ?? null
     );
 
-    this.hoursRepo.deleteForRestaurant(id);
+    const tx = db.transaction(() => {
+      this.hoursRepo.deleteForRestaurant(id);
 
-    if (hours) {
-      for (const h of hours) {
-        this.hoursRepo.insertHours(id, h.day, h.hours);
+      if (hours !== undefined) {
+        for (const h of hours) {
+          this.hoursRepo.insertHours(id, h.day, h.hours);
+        }
       }
-    }
+    });
 
+    tx();
     return { id };
   }
 
@@ -98,8 +113,14 @@ export class RestaurantAdminService {
       throw new AppError("Restaurant not found", 404, "RESTAURANT_NOT_FOUND");
     }
 
-    this.hoursRepo.deleteForRestaurant(id);
-    this.repo.deleteRestaurant(id);
+    const tx = db.transaction(() => {
+      this.reviewRepo.deleteForRestaurant(id);
+      this.favoriteRepo.deleteForRestaurant(id);
+      this.hoursRepo.deleteForRestaurant(id);
+      this.repo.deleteRestaurant(id);
+    });
+
+    tx();
 
     return { id };
   }
