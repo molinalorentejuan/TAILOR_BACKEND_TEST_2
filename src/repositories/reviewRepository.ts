@@ -21,9 +21,7 @@ export interface RestaurantReviewRow extends ReviewRow {
 
 @injectable()
 export class ReviewRepository {
-  /**
-   * Todas las reviews de un usuario
-   */
+
   listReviewsByUser(userId: number): UserReviewRow[] {
     return db
       .prepare(
@@ -38,9 +36,6 @@ export class ReviewRepository {
       .all(userId) as UserReviewRow[];
   }
 
-  /**
-   * Review concreta de un usuario
-   */
   findUserReview(
     reviewId: number,
     userId: number
@@ -54,9 +49,6 @@ export class ReviewRepository {
       .get(reviewId, userId) as ReviewRow | undefined;
   }
 
-  /**
-   * Update review
-   */
   updateReview(reviewId: number, rating: number, comments?: string) {
     return db
       .prepare(`
@@ -67,18 +59,12 @@ export class ReviewRepository {
       .run(rating, comments || null, reviewId);
   }
 
-  /**
-   * Delete review
-   */
   deleteReview(reviewId: number) {
     return db
       .prepare(`DELETE FROM reviews WHERE id=?`)
       .run(reviewId);
   }
 
-  /**
-   * Reviews por restaurante
-   */
   listReviewsForRestaurant(
     restaurantId: number
   ): RestaurantReviewRow[] {
@@ -95,9 +81,6 @@ export class ReviewRepository {
       .all(restaurantId) as RestaurantReviewRow[];
   }
 
-  /**
-   * Insertar review nueva
-   */
   insertReview(
     userId: number,
     restaurantId: number,
@@ -114,9 +97,6 @@ export class ReviewRepository {
       .run(userId, restaurantId, rating, comments || null);
   }
 
-  /**
-   * Obtener review por ID (sin filtrar por usuario)
-   */
   findReviewById(reviewId: number): ReviewRow | undefined {
     return db
       .prepare(`
@@ -126,5 +106,10 @@ export class ReviewRepository {
       `)
       .get(reviewId) as ReviewRow | undefined;
   }
+
+    deleteForRestaurant(restaurantId: number) {
+      db.prepare(`DELETE FROM reviews WHERE restaurant_id=?`)
+        .run(restaurantId);
+    }
 
 }

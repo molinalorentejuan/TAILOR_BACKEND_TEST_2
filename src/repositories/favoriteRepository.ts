@@ -37,4 +37,10 @@ export class FavoriteRepository {
       )
       .all(userId);
   }
+
+    deleteForRestaurant(restaurantId: number) {
+      db.prepare(`DELETE FROM favorites WHERE restaurant_id=?`)
+        .run(restaurantId);
+    }
+
 }

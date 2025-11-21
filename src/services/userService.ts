@@ -48,13 +48,13 @@ export class UserService {
     this.reviewRepo.updateReview(
       params.id,
       data.rating,
-      data.comment ?? null
+      data.comment ?? undefined
     );
 
     return { id: params.id };
   }
 
-  deleteUserReview(params: ReviewIdParamInput, userId: number) {
+  deleteUserReview(params: ReviewParamsInput, userId: number) {
     const review = this.reviewRepo.findUserReview(params.id, userId);
 
     if (!review) {

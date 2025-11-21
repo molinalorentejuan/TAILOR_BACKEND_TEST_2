@@ -3,24 +3,21 @@ import db from "../db/db";
 
 @injectable()
 export class AdminRepository {
-  /** USERS */
   countUsers(): number {
     return db.prepare("SELECT COUNT(*) as c FROM users").get().c;
   }
 
-  /** REVIEWS */
   countReviews(): number {
     return db.prepare("SELECT COUNT(*) as c FROM reviews").get().c;
   }
 
-  /** RESTAURANTS */
   countRestaurants(): number {
     return db.prepare("SELECT COUNT(*) as c FROM restaurants").get().c;
   }
 
   /**
    * TOP 3 mejor valorados
-   * Calculamos el rating medio REAL desde reviews
+   * Calculo del rating medio desde reviews
    */
   getTopRated() {
     return db
