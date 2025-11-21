@@ -3,11 +3,9 @@ import path from "path";
 
 const isProd = process.env.NODE_ENV === "production";
 
-// Railway → DB en /app/data/restaurants.db (la copia Docker)
-// Local → dist/db/restaurants.db (la copia el script del build)
-const dbPath = isProd
-  ? "/app/data/restaurants.db"
-  : path.join(__dirname, "restaurants.db");
+// PRODUCTION → dist/db/restaurants.db (dentro de la imagen)
+// LOCAL → dist/db/restaurants.db (lo copia el build script igual)
+const dbPath = path.join(__dirname, "db", "restaurants.db");
 
 const db = new Database(dbPath);
 

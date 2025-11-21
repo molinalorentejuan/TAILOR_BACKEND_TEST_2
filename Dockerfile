@@ -20,15 +20,10 @@ RUN apt-get update && apt-get install -y curl && apt-get clean
 # Usuario seguro
 RUN addgroup --system appgroup && adduser --system appuser --ingroup appgroup
 
-# Creamos carpeta writable donde irá la DB
-RUN mkdir -p /app/data && chown -R appuser:appgroup /app/data
-# Copiamos build
+# Copiamos build completo (incluye dist/db/restaurants.db)
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY swagger ./swagger
-
-# ⚠️ COPIAR LA BASE DE DATOS A /app/data (ESTO ES LO QUE FALTABA)
-COPY --from=builder /app/dist/db/restaurants.db /app/data/restaurants.db
 
 ENV NODE_ENV=production
 ENV PORT=3000
