@@ -11,7 +11,7 @@ export const CreateReviewDTO = z.object({
   comment: z.string().optional(),
 });
 
-/**
+/** 
  * UPDATE REVIEW
  * Cuando editas tu propia review (PUT /me/reviews/:id)
  */
