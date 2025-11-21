@@ -1,37 +1,42 @@
 # ----------- Build -----------
 FROM node:20 AS builder
-
 WORKDIR /app
 
 COPY package*.json ./
 RUN npm install
 
 COPY . .
-RUN npm run build   # esto crea dist/ + copia la DB en dist/db/
+RUN npm run build
 
 # ----------- Runtime -----------
 FROM node:20-slim AS runner
-
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y curl && apt-get clean
+
 RUN addgroup --system appgroup && adduser --system appuser --ingroup appgroup
 
-# Carpeta writable
-RUN mkdir -p /app/data && chown -R appuser:appgroup /app/data
+# Carpeta para la DB
+RUN mkdir -p /app/data
 
-# Copiamos dist completo
+# Copiamos el build
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY swagger ./swagger
 
-# COPIAMOS TAMBIÉN LA BASE DE DATOS YA BUILDADA
+# Copiamos la BD
 COPY --from=builder /app/dist/db/restaurants.db /app/data/restaurants.db
+
+# 🔥 DAR PERMISOS AL ARCHIVO AQUÍ 🔥
+RUN chown -R appuser:appgroup /app/data
+RUN chmod 664 /app/data/restaurants.db
 
 ENV NODE_ENV=production
 ENV PORT=3000
 
 EXPOSE 3000
+
+# Cambiamos de usuario AHORA
 USER appuser
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
