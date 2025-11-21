@@ -325,7 +325,7 @@ paths:
       security: [{ bearerAuth: [] }]
       parameters:
         - in: path
-          name: restaurant_id
+          name: restaurantId
           schema: { type: integer }
       responses:
         "201": { description: Added }
@@ -336,7 +336,7 @@ paths:
       security: [{ bearerAuth: [] }]
       parameters:
         - in: path
-          name: restaurant_id
+          name: restaurantId
           schema: { type: integer }
       responses:
         "204": { description: Removed }
