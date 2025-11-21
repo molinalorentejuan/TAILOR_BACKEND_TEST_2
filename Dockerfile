@@ -25,7 +25,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY swagger ./swagger
 
 # Copiamos la BD
-COPY --from=builder /app/dist/db/restaurants.db /app/data/restaurants.db
+COPY src/db/restaurants.db /app/data/restaurants.db
 
 # 🔥 DAR PERMISOS AL ARCHIVO AQUÍ 🔥
 RUN chown -R appuser:appgroup /app/data
