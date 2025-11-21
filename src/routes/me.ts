@@ -90,7 +90,7 @@ router.delete(
  * POST /me/favorites/:restaurantId
  */
 router.post(
-  "/favorites/:restaurantId",
+  "/favorites/:restaurant_id",
   authMiddleware,
   validateParams(FavoriteParamsDTO),
   (req: AuthRequest, res, next) => {
@@ -111,7 +111,7 @@ router.post(
  * DELETE /me/favorites/:restaurantId
  */
 router.delete(
-  "/favorites/:restaurantId",
+  "/favorites/:restaurant_id",
   authMiddleware,
   validateParams(FavoriteParamsDTO),
   (req: AuthRequest, res, next) => {

@@ -2,11 +2,13 @@ openapi: 3.0.0
 info:
   title: Tailor Restaurants API
   version: "1.0.0"
+
 servers:
   - url: http://localhost:3000
   - url: https://tailorbackendtest2-production.up.railway.app
 
 components:
+
   securitySchemes:
     bearerAuth:
       type: http
@@ -16,13 +18,37 @@ components:
   schemas:
 
     # -------------------------
+    # GENERIC
+    # -------------------------
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "OK"
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: string
+        status:
+          type: integer
+      example:
+        message: "Invalid data"
+        code: "VALIDATION_ERROR"
+        status: 400
+
+    # -------------------------
     # USER
     # -------------------------
     User:
       type: object
       properties:
         id: { type: integer }
-        email: { type: string, format: email }
+        email: { type: string }
         role: { type: string, enum: [USER, ADMIN] }
 
     # -------------------------
@@ -32,7 +58,7 @@ components:
       type: object
       required: [email, password]
       properties:
-        email: { type: string, format: email }
+        email: { type: string }
         password: { type: string }
         name: { type: string }
 
@@ -46,28 +72,20 @@ components:
     # -------------------------
     # RESTAURANTS
     # -------------------------
+    OpeningHours:
+      type: object
+      properties:
+        day: { type: string }
+        hours: { type: string }
+
     Restaurant:
       type: object
       properties:
         id: { type: integer }
         name: { type: string }
         neighborhood: { type: string, nullable: true }
-        photograph: { type: string, nullable: true }
-        address: { type: string, nullable: true }
-        lat: { type: number }
-        lng: { type: number }
-        image: { type: string, nullable: true }
         cuisine_type: { type: string, nullable: true }
-        rating: { type: number, format: float }
-
-    RestaurantCreate:
-      type: object
-      required: [name]
-      properties:
-        name: { type: string }
-        neighborhood: { type: string, nullable: true }
-        cuisine: { type: string, nullable: true }
-        rating: { type: number, nullable: true }
+        rating: { type: number }
         address: { type: string, nullable: true }
         photograph: { type: string, nullable: true }
         lat: { type: number, nullable: true }
@@ -76,17 +94,32 @@ components:
         hours:
           type: array
           items:
-            type: object
-            properties:
-              day: { type: string }
-              hours: { type: string }
+            $ref: "#/components/schemas/OpeningHours"
+
+    RestaurantCreate:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        neighborhood: { type: string, nullable: true }
+        cuisine_type: { type: string, nullable: true }
+        rating: { type: number }
+        address: { type: string, nullable: true }
+        photograph: { type: string, nullable: true }
+        lat: { type: number, nullable: true }
+        lng: { type: number, nullable: true }
+        image: { type: string, nullable: true }
+        hours:
+          type: array
+          items:
+            $ref: "#/components/schemas/OpeningHours"
 
     RestaurantUpdate:
       type: object
       properties:
         name: { type: string }
-        cuisine: { type: string }
         neighborhood: { type: string }
+        cuisine_type: { type: string }
         rating: { type: number }
         address: { type: string }
         photograph: { type: string }
@@ -96,10 +129,7 @@ components:
         hours:
           type: array
           items:
-            type: object
-            properties:
-              day: { type: string }
-              hours: { type: string }
+            $ref: "#/components/schemas/OpeningHours"
 
     # -------------------------
     # REVIEWS
@@ -110,38 +140,21 @@ components:
         id: { type: integer }
         restaurant_id: { type: integer }
         user_id: { type: integer }
-        rating: { type: integer, minimum: 1, maximum: 5 }
-        comments: { type: string, nullable: true }
-        created_at: { type: string, format: date-time }
-
-    ReviewWithUserEmail:
-      allOf:
-        - $ref: "#/components/schemas/Review"
-        - type: object
-          properties:
-            user_email: { type: string }
-
-    UserReviewWithRestaurant:
-      type: object
-      properties:
-        id: { type: integer }
-        restaurant_id: { type: integer }
         rating: { type: integer }
-        comments: { type: string, nullable: true }
+        comment: { type: string }
         created_at: { type: string }
-        restaurant_name: { type: string }
 
     ReviewCreate:
       type: object
       required: [rating]
       properties:
-        rating: { type: integer, minimum: 1, maximum: 5 }
+        rating: { type: integer }
         comment: { type: string, nullable: true }
 
     ReviewUpdate:
       type: object
       properties:
-        rating: { type: integer, minimum: 1, maximum: 5 }
+        rating: { type: integer }
         comment: { type: string, nullable: true }
 
     # -------------------------
@@ -150,20 +163,7 @@ components:
     Favorite:
       type: object
       properties:
-        restaurant_id: { type: integer }
-
-    # -------------------------
-    # GENERIC
-    # -------------------------
-    MessageResponse:
-      type: object
-      properties:
-        message: { type: string }
-
-    ErrorResponse:
-      type: object
-      properties:
-        message: { type: string }
+        restaurantId: { type: integer }
 
 paths:
 
@@ -183,19 +183,21 @@ paths:
   # -------------------------
   /auth/register:
     post:
-      summary: Register
+      summary: Register a user
       tags: [Auth]
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/AuthRequest" }
+            schema:
+              $ref: "#/components/schemas/AuthRequest"
       responses:
         "201":
-          description: Created
+          description: Registered
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/AuthResponse" }
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
 
   /auth/login:
     post:
@@ -205,16 +207,18 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/AuthRequest" }
+            schema:
+              $ref: "#/components/schemas/AuthRequest"
       responses:
         "200":
           description: Logged in
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/AuthResponse" }
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
 
   # -------------------------
-  # RESTAURANTS (PUBLIC)
+  # RESTAURANTS
   # -------------------------
   /restaurants:
     get:
@@ -223,22 +227,16 @@ paths:
       responses:
         "200":
           description: OK
-
-    post:
-      summary: Create restaurant (ADMIN)
-      tags: [Admin Restaurants]
-      security: [{ bearerAuth: [] }]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/RestaurantCreate" }
-      responses:
-        "201": { description: Created }
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Restaurant"
 
   /restaurants/{id}:
     get:
-      summary: Get restaurant
+      summary: Get restaurant by ID
       tags: [Restaurants]
       parameters:
         - in: path
@@ -246,43 +244,16 @@ paths:
           required: true
           schema: { type: integer }
       responses:
-        "200": { description: OK }
-        "404": { description: Not found }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Restaurant"
 
-    put:
-      summary: Update restaurant
-      tags: [Admin Restaurants]
-      security: [{ bearerAuth: [] }]
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: integer }
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/RestaurantUpdate" }
-      responses:
-        "200": { description: Updated }
-
-    delete:
-      summary: Delete restaurant
-      tags: [Admin Restaurants]
-      security: [{ bearerAuth: [] }]
-      parameters:
-        - in: path
-          name: id
-          schema: { type: integer }
-      responses:
-        "204": { description: Deleted }
-
-  # -------------------------
-  # REVIEWS
-  # -------------------------
   /restaurants/{id}/reviews:
     get:
-      summary: List restaurant reviews
+      summary: List reviews for a restaurant
       tags: [Reviews]
       parameters:
         - in: path
@@ -291,12 +262,6 @@ paths:
       responses:
         "200":
           description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ReviewWithUserEmail"
 
     post:
       summary: Create review
@@ -305,12 +270,14 @@ paths:
       parameters:
         - in: path
           name: id
+          required: true
           schema: { type: integer }
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/ReviewCreate" }
+            schema:
+              $ref: "#/components/schemas/ReviewCreate"
       responses:
         "201": { description: Created }
 
@@ -319,44 +286,26 @@ paths:
   # -------------------------
   /me:
     get:
-      summary: Current user
+      summary: Get authenticated user
       tags: [Me]
       security: [{ bearerAuth: [] }]
       responses:
         "200": { description: OK }
 
-  /me/reviews:
-    get:
-      summary: Reviews by authenticated user
-      tags: [Me]
-      security: [{ bearerAuth: [] }]
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/UserReviewWithRestaurant"
-
   /me/reviews/{id}:
     put:
-      summary: Update review
+      summary: Update my review
       tags: [Me]
       security: [{ bearerAuth: [] }]
       parameters:
         - in: path
           name: id
           schema: { type: integer }
-      requestBody:
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/ReviewUpdate" }
       responses:
         "200": { description: Updated }
 
     delete:
-      summary: Delete review
+      summary: Delete my review
       tags: [Me]
       security: [{ bearerAuth: [] }]
       parameters:
@@ -369,33 +318,25 @@ paths:
   # -------------------------
   # FAVORITES
   # -------------------------
-  /me/favorites:
-    get:
-      summary: List favorites
-      tags: [Favorites]
-      security: [{ bearerAuth: [] }]
-      responses:
-        "200": { description: OK }
-
   /me/favorites/{restaurantId}:
     post:
-      summary: Add favorite
+      summary: Add restaurant to favorites
       tags: [Favorites]
       security: [{ bearerAuth: [] }]
       parameters:
         - in: path
-          name: restaurant_id
+          name: restaurantId
           schema: { type: integer }
       responses:
         "201": { description: Added }
 
     delete:
-      summary: Remove favorite
+      summary: Remove restaurant from favorites
       tags: [Favorites]
       security: [{ bearerAuth: [] }]
       parameters:
         - in: path
-          name: restaurant_id
+          name: restaurantId
           schema: { type: integer }
       responses:
         "204": { description: Removed }
