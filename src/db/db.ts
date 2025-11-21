@@ -1,22 +1,13 @@
 import Database from "better-sqlite3";
 import path from "path";
-import fs from "fs";
 
 const isProd = process.env.NODE_ENV === "production";
 
-// Producción → /app/data/restaurants.db
-// Local → dist/db/restaurants.db
+// Railway → DB en /app/data/restaurants.db (la copia Docker)
+// Local → dist/db/restaurants.db (la copia el script del build)
 const dbPath = isProd
   ? "/app/data/restaurants.db"
-  : path.join(__dirname, "db", "restaurants.db");
-
-// En producción aseguramos que el directorio existe
-if (isProd) {
-  const dir = path.dirname(dbPath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-}
+  : path.join(__dirname, "restaurants.db");
 
 const db = new Database(dbPath);
 

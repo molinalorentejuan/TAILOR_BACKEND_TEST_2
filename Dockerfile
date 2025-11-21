@@ -7,7 +7,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-RUN npm run build   # <-- esto crea dist/ + copia la DB en dist/db/
+RUN npm run build   # esto crea dist/ + copia la DB en dist/db/
 
 # ----------- Runtime -----------
 FROM node:20-slim AS runner
@@ -20,10 +20,16 @@ RUN apt-get update && apt-get install -y curl && apt-get clean
 # Usuario seguro
 RUN addgroup --system appgroup && adduser --system appuser --ingroup appgroup
 
-# Copiamos build completo
+# Creamos carpeta writable donde irá la DB
+RUN mkdir -p /app/data && chown -R appuser:appgroup /app/data
+
+# Copiamos build
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY swagger ./swagger
+
+# ⚠️ COPIAR LA BASE DE DATOS A /app/data (ESTO ES LO QUE FALTABA)
+COPY --from=builder /app/dist/db/restaurants.db /app/data/restaurants.db
 
 ENV NODE_ENV=production
 ENV PORT=3000
@@ -31,7 +37,6 @@ ENV PORT=3000
 EXPOSE 3000
 USER appuser
 
-# Healthcheck
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl --fail http://localhost:3000/health || exit 1
 
