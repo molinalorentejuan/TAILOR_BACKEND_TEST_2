@@ -48,7 +48,7 @@ components:
       type: object
       properties:
         id: { type: integer }
-        email: { type: string }
+        email: { type: string, format: email }
         role: { type: string, enum: [USER, ADMIN] }
 
     # -------------------------
@@ -58,7 +58,7 @@ components:
       type: object
       required: [email, password]
       properties:
-        email: { type: string }
+        email: { type: string, format: email }
         password: { type: string }
         name: { type: string }
 
