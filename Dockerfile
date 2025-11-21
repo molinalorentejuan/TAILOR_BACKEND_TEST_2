@@ -27,7 +27,7 @@ COPY swagger ./swagger
 # Copiamos la BD
 COPY src/db/restaurants.db /app/data/restaurants.db
 
-# 🔥 DAR PERMISOS AL ARCHIVO AQUÍ 🔥
+# PERMISOS AL ARCHIVO AQUÍ
 RUN chown -R appuser:appgroup /app/data
 RUN chmod 664 /app/data/restaurants.db
 
@@ -36,7 +36,7 @@ ENV PORT=3000
 
 EXPOSE 3000
 
-# Cambiamos de usuario AHORA
+# cambio de user
 USER appuser
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
