@@ -3,6 +3,8 @@ import { Router } from "express";
 import { authMiddleware, roleMiddleware } from "../middleware/auth";
 import { container } from "../container";
 import { AdminService } from "../services/adminService";
+import { StatusCodes } from "http-status-codes";
+import { AdminStatsDTO } from "../dto/responseDTO";
 
 const router = Router();
 const adminService = container.resolve(AdminService);
@@ -17,7 +19,8 @@ router.get(
   (req, res, next) => {
     try {
       const stats = adminService.getAdminStats();
-      return res.json(stats);
+      const response = AdminStatsDTO.parse(stats);
+      return res.status(StatusCodes.OK).json(response);
     } catch (err) {
       next(err);
     }

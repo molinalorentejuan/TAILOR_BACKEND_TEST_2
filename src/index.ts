@@ -4,6 +4,8 @@ import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import { generalRateLimiter } from './middleware/rateLimit';
+import { requestIdMiddleware } from './middleware/requestId';
+import { requestLogger } from './middleware/requestLogger';
 
 import authRoutes from './routes/auth';
 import restaurantsRoutes from './routes/restaurants';
@@ -22,6 +24,8 @@ import { errorHandler } from "./errors/errorHandler";
 
 const app = express();
 app.set("trust proxy", 1);
+app.use(requestIdMiddleware);
+app.use(requestLogger);
 
 app.use(cors({
   origin: "*",

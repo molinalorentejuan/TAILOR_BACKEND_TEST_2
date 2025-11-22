@@ -26,9 +26,9 @@ export class AdminRepository {
         SELECT
           r.id,
           r.name,
-          r.cuisine_type AS cuisine,
+          r.cuisine_type
           r.neighborhood,
-          AVG(rv.rating) AS avgRating
+          AVG(rv.rating) AS avg_rating
         FROM restaurants r
         LEFT JOIN reviews rv ON rv.restaurant_id = r.id
         GROUP BY r.id
@@ -49,7 +49,7 @@ export class AdminRepository {
         SELECT
           r.id,
           r.name,
-          r.cuisine_type AS cuisine,
+          r.cuisine_type,
           COUNT(rv.id) AS reviews
         FROM restaurants r
         LEFT JOIN reviews rv ON rv.restaurant_id = r.id
@@ -60,15 +60,15 @@ export class AdminRepository {
       )
       .all();
   }
+/** ESTADÍSTICAS GLOBALES */
+   getStats() {
+      return {
+         users_count: this.countUsers(),
+         restaurants_count: this.countRestaurants(),
+         reviews_count: this.countReviews(),
+         top_rated: this.getTopRated(),
+         most_reviewed: this.getMostReviewed(),
+   };
+ }
 
-  /** ESTADÍSTICAS GLOBALES */
-  getStats() {
-    return {
-      users: this.countUsers(),
-      restaurants: this.countRestaurants(),
-      reviews: this.countReviews(),
-      topRated: this.getTopRated(),
-      mostReviewed: this.getMostReviewed(),
-    };
-  }
 }

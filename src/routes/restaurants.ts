@@ -7,13 +7,24 @@ import {
   validateBody,
   validateParams,
 } from "../middleware/validate";
+
 import {
   RestaurantsQueryDTO,
   CreateRestaurantDTO,
+  RestaurantParamsDTO,
 } from "../dto/restaurantDTO";
-import { CreateReviewDTO, ReviewParamsDTO } from "../dto/reviewDTO";
+
+import {
+  RestaurantListDTO,
+  RestaurantDetailDTO,
+  RestaurantReviewListDTO,
+  ReviewIdResponseDTO,
+} from "../dto/responseDTO";
+
+import { CreateReviewDTO } from "../dto/reviewDTO";
 import { container } from "../container";
 import { RestaurantService } from "../services/restaurantService";
+import { StatusCodes } from "http-status-codes";
 
 const router = Router();
 const restaurantService = container.resolve(RestaurantService);
@@ -27,9 +38,10 @@ router.get(
   cacheMiddleware,
   (req, res, next) => {
     try {
-      const query = req.query as any; // Zod ya lo validó
+      const query = req.query as any; // ya validado por Zod
       const result = restaurantService.listRestaurants(query);
-      return res.json(result);
+      const response = RestaurantListDTO.parse(result);
+      return res.status(StatusCodes.OK).json(response);
     } catch (err) {
       next(err);
     }
@@ -37,17 +49,18 @@ router.get(
 );
 
 /**
- * GET /restaurants/:id
+ * GET /restaurants/:restaurant_id
  */
 router.get(
-  "/:id",
-  validateParams(ReviewParamsDTO),
+  "/:restaurant_id",
+  validateParams(RestaurantParamsDTO),
   cacheMiddleware,
   (req, res, next) => {
     try {
-      const id = Number(req.params.id);
-      const restaurant = restaurantService.getRestaurantById(id);
-      return res.json(restaurant);
+      const restaurantId = Number(req.params.restaurant_id);
+      const restaurant = restaurantService.getRestaurantById(restaurantId);
+      const response = RestaurantDetailDTO.parse(restaurant);
+      return res.status(StatusCodes.OK).json(response);
     } catch (err) {
       next(err);
     }
@@ -55,17 +68,18 @@ router.get(
 );
 
 /**
- * GET /restaurants/:id/reviews
+ * GET /restaurants/:restaurant_id/reviews
  */
 router.get(
-  "/:id/reviews",
-  validateParams(ReviewParamsDTO),
+  "/:restaurant_id/reviews",
+  validateParams(RestaurantParamsDTO),
   cacheMiddleware,
   (req, res, next) => {
     try {
-      const id = Number(req.params.id);
-      const reviews = restaurantService.listReviewsForRestaurant(id);
-      return res.json(reviews);
+      const restaurantId = Number(req.params.restaurant_id);
+      const reviews = restaurantService.listReviewsForRestaurant(restaurantId);
+      const response = RestaurantReviewListDTO.parse(reviews);
+      return res.status(StatusCodes.OK).json(response);
     } catch (err) {
       next(err);
     }
@@ -73,27 +87,26 @@ router.get(
 );
 
 /**
- * POST /restaurants/:id/reviews
+ * POST /restaurants/:restaurant_id/reviews
  */
 router.post(
-  "/:id/reviews",
+  "/:restaurant_id/reviews",
   authMiddleware,
-  validateParams(ReviewParamsDTO),
+  validateParams(RestaurantParamsDTO),
   validateBody(CreateReviewDTO),
   (req: AuthRequest, res, next) => {
     try {
-      const restaurant_id = Number(req.params.id);
+      const restaurantId = Number(req.params.restaurant_id);
       const { rating, comment } = req.body;
-
       const result = restaurantService.createReviewForRestaurant({
         user_id: req.user!.id,
-        restaurant_id,
+        restaurant_id: restaurantId,
         rating,
         comment,
       });
-
       invalidateCache();
-      return res.status(201).json({ id: result.id });
+      const response = ReviewIdResponseDTO.parse({ id: result.id });
+      return res.status(StatusCodes.CREATED).json(response);
     } catch (err) {
       next(err);
     }

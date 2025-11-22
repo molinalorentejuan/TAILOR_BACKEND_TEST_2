@@ -3,11 +3,18 @@ import { Router } from "express";
 import { authMiddleware, roleMiddleware, AuthRequest } from "../middleware/auth";
 import { validateBody, validateParams } from "../middleware/validate";
 import { invalidateCache } from "../middleware/cache";
-import { CreateRestaurantDTO, UpdateRestaurantDTO, RestaurantParamsDTO } from "../dto/restaurantDTO";
-import { z } from "zod";
-
+import {
+  CreateRestaurantDTO,
+  UpdateRestaurantDTO,
+  RestaurantParamsDTO,
+} from "../dto/restaurantDTO";
+import {
+  RestaurantDetailDTO,
+  RestaurantIdResponseDTO,
+} from "../dto/responseDTO";
 import { container } from "../container";
 import { RestaurantAdminService } from "../services/restaurantAdminService";
+import { StatusCodes } from "http-status-codes";
 
 const router = Router();
 const adminService = container.resolve(RestaurantAdminService);
@@ -24,7 +31,10 @@ router.post(
     try {
       const result = adminService.createRestaurant(req.body);
       invalidateCache();
-      return res.status(201).json(result);
+      const response = RestaurantIdResponseDTO.parse({
+        id: result.id,
+      });
+      return res.status(StatusCodes.CREATED).json(response);
     } catch (err) {
       next(err);
     }
@@ -32,20 +42,22 @@ router.post(
 );
 
 /**
- * PUT /admin/restaurants/:id
+ * PUT /admin/restaurants/:restaurant_id
  */
 router.put(
-  "/:id",
+  "/:restaurant_id",
   authMiddleware,
   roleMiddleware(["ADMIN"]),
   validateParams(RestaurantParamsDTO),
   validateBody(UpdateRestaurantDTO),
   (req: AuthRequest, res, next) => {
     try {
-      const id = Number(req.params.id);
-      adminService.updateRestaurant(id, req.body);
+      const restaurant_id = req.params.restaurant_id;
+      adminService.updateRestaurant(restaurant_id, req.body);
       invalidateCache();
-      return res.json({ message: "Restaurant updated" });
+      return res
+        .status(StatusCodes.OK)
+        .json(RestaurantResponseDTO.parse({ id: restaurant_id }));
     } catch (err) {
       next(err);
     }
@@ -53,19 +65,19 @@ router.put(
 );
 
 /**
- * DELETE /admin/restaurants/:id
+ * DELETE /admin/restaurants/:restaurant_id
  */
 router.delete(
-  "/:id",
+  "/:restaurant_id",
   authMiddleware,
   roleMiddleware(["ADMIN"]),
   validateParams(RestaurantParamsDTO),
   (req: AuthRequest, res, next) => {
     try {
-      const id = Number(req.params.id);
-      adminService.deleteRestaurant(id);
+      const restaurant_id = req.params.restaurant_id;
+      adminService.deleteRestaurant(restaurant_id);
       invalidateCache();
-      return res.status(204).send();
+      return res.status(StatusCodes.NO_CONTENT).send();
     } catch (err) {
       next(err);
     }

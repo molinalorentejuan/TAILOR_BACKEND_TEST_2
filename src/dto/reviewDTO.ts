@@ -1,25 +1,41 @@
 import { z } from "zod";
 
+/* ---------------------------------------
+   CREATE REVIEW
+---------------------------------------- */
 export const CreateReviewDTO = z.object({
-  rating: z.number().int().min(1).max(5),
-  comment: z.string().optional(),
+  rating: z.coerce.number()
+    .int()
+    .min(1, { message: "RATING_MIN" })
+    .max(5, { message: "RATING_MAX" }),
+
+  comment: z.string().trim().optional().nullable(),
 });
 
+/* ---------------------------------------
+   UPDATE REVIEW
+---------------------------------------- */
 export const UpdateReviewDTO = z.object({
-  rating: z.number().int().min(1).max(5),
-  comment: z.string().optional(),
+  rating: z.coerce.number()
+    .int()
+    .min(1, { message: "RATING_MIN" })
+    .max(5, { message: "RATING_MAX" }),
+
+  comment: z.string().trim().optional().nullable(),
 });
 
-/**
- * PARAMS :id
- */
+/* ---------------------------------------
+   PARAMS (:review_id)
+---------------------------------------- */
 export const ReviewParamsDTO = z.object({
-  id: z.coerce.number().int().positive(),
+  review_id: z.coerce.number()
+    .int()
+    .positive({ message: "INVALID_REVIEW_ID" }),
 });
 
-/**
- * TYPES
- */
+/* ---------------------------------------
+   TYPES
+---------------------------------------- */
 export type CreateReviewInput = z.infer<typeof CreateReviewDTO>;
 export type UpdateReviewInput = z.infer<typeof UpdateReviewDTO>;
 export type ReviewParamsInput = z.infer<typeof ReviewParamsDTO>;

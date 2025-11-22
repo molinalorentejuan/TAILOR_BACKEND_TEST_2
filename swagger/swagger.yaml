@@ -131,6 +131,30 @@ components:
           items:
             $ref: "#/components/schemas/OpeningHours"
 
+    RestaurantsQuery:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          default: 1
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 10
+        cuisine_type:
+          type: string
+        neighborhood:
+          type: string
+        rating:
+          type: number
+          minimum: 0
+          maximum: 5
+        sort:
+          type: string
+          example: "rating:desc"
+
     # -------------------------
     # REVIEWS
     # -------------------------
@@ -223,7 +247,31 @@ paths:
   /restaurants:
     get:
       summary: List restaurants
-      tags: [Restaurants]
+      tags: [ Restaurants ]
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 10 }
+        - in: query
+          name: cuisine_type
+          schema: { type: string }
+        - in: query
+          name: neighborhood
+          schema: { type: string }
+        - in: query
+          name: rating
+          schema:
+            type: number
+            minimum: 0
+            maximum: 5
+        - in: query
+          name: sort
+          schema:
+            type: string
+            example: "rating:desc"
       responses:
         "200":
           description: OK
@@ -301,6 +349,12 @@ paths:
         - in: path
           name: id
           schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewUpdate"
       responses:
         "200": { description: Updated }
 

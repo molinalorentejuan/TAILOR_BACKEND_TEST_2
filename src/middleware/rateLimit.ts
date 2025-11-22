@@ -12,7 +12,6 @@ export const authRateLimiter = rateLimit({
     next(new AppError(t(req, "TOO_MANY_REQUESTS"), 429, "RATE_LIMIT_AUTH"));
   },
 
-  // Por seguridad enterprise: si rate-limit falla, no rompe el server
   skipFailedRequests: false,
   skipSuccessfulRequests: false,
 });

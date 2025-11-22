@@ -26,7 +26,7 @@ export class ReviewRepository {
     return db
       .prepare(
         `
-        SELECT rv.*, r.name AS restaurantName
+        SELECT rv.*, r.name AS restaurant_name
         FROM reviews rv
         JOIN restaurants r ON r.id = rv.restaurant_id
         WHERE rv.user_id = ?
@@ -71,7 +71,7 @@ export class ReviewRepository {
     return db
       .prepare(
         `
-        SELECT rv.*, u.email AS userEmail
+        SELECT rv.*, u.email AS user_email
         FROM reviews rv
         JOIN users u ON u.id = rv.user_id
         WHERE rv.restaurant_id = ?

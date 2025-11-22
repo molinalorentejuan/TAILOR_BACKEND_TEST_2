@@ -1,18 +1,38 @@
 import { z } from "zod";
 
 export const RegisterDTO = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-  name: z.string().min(1),
+  email: z
+    .string()
+    .email({ message: "INVALID_EMAIL" })
+    .trim()
+    .toLowerCase(),
+
+  password: z
+    .string()
+    .min(8, { message: "PASSWORD_TOO_SHORT" })
+    .regex(/[A-Z]/, { message: "PASSWORD_UPPERCASE_REQUIRED" })
+    .regex(/[a-z]/, { message: "PASSWORD_LOWERCASE_REQUIRED" })
+    .regex(/[0-9]/, { message: "PASSWORD_NUMBER_REQUIRED" })
+    .trim(),
+
+  name: z
+    .string()
+    .min(1, { message: "NAME_REQUIRED" })
+    .trim(),
 });
 
 export const LoginDTO = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
+  email: z
+    .string()
+    .email({ message: "INVALID_EMAIL" })
+    .trim()
+    .toLowerCase(),
+
+  password: z
+    .string()
+    .min(1, { message: "PASSWORD_REQUIRED" }),
 });
 
-/**
- * TYPES
- */
+/* TYPES */
 export type RegisterParamsInput = z.infer<typeof RegisterDTO>;
 export type LoginParamsInput = z.infer<typeof LoginDTO>;

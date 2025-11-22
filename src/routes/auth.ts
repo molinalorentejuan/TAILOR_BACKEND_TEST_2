@@ -1,9 +1,12 @@
+// src/routes/auth.ts
 import { Router } from "express";
 import { validateBody } from "../middleware/validate";
 import { authRateLimiter } from "../middleware/rateLimit";
 import { container } from "../container";
 import { AuthService } from "../services/authService";
 import { RegisterDTO, LoginDTO } from "../dto/authDTO";
+import { AuthRegisterResponseDTO, AuthLoginResponseDTO } from "../dto/responseDTO";
+import { StatusCodes } from "http-status-codes";
 
 const router = Router();
 const authService = container.resolve(AuthService);
@@ -18,7 +21,8 @@ router.post(
   (req, res, next) => {
     try {
       const token = authService.registerUser(req.body);
-      return res.status(201).json({ token });
+      const response = AuthRegisterResponseDTO.parse({ token });
+      return res.status(StatusCodes.CREATED).json(response);
     } catch (err) {
       next(err);
     }
@@ -34,8 +38,9 @@ router.post(
   validateBody(LoginDTO),
   (req, res, next) => {
     try {
-      const { token, user } = authService.loginUser(req.body);
-      return res.json({ token, user });
+      const result = authService.loginUser(req.body);
+      const response = AuthLoginResponseDTO.parse(result);
+      return res.status(StatusCodes.OK).json(response);
     } catch (err) {
       next(err);
     }

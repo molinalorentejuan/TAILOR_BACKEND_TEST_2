@@ -15,7 +15,7 @@
 
     "baseUrl": "./src",
 
-    "types": ["node", "reflect-metadata"],
+    "types": ["node", "jest"],
 
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true

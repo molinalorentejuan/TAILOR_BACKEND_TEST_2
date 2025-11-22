@@ -36,3 +36,24 @@ Porque:
 	2.	Esos errores automáticamente suben al middleware errorHandler.
 	3.	El handler envuelve todo y devuelve mensaje + status + i18n.
 	4.	Repetir try/catch en todos los servicios ensucia y viola SRP.
+
+🟩 2. Router = frontera de la API
+
+En el router es donde conviertes interno → público.
+
+El router es el lugar correcto para:
+	•	aplicar DTOs de salida
+	•	validar lo que mandas al cliente
+	•	ocultar campos internos
+	•	transformar formatos
+	•	garantizar contrato estable
+
+2. La validación (DTO) y la traducción (i18n) viven en capAS distintas
+
+✔ Los DTO → definen reglas
+
+✔ El i18n → convierte mensajes
+
+Cuando los juntan →
+ES UNA CAPA MEZCLADA.
+Y eso es exactamente lo que un senior NUNCA hace.

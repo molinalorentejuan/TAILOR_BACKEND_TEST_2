@@ -2,14 +2,21 @@
 import { Router } from "express";
 import { authMiddleware, AuthRequest } from "../middleware/auth";
 import { validateBody, validateParams } from "../middleware/validate";
-import {
-  UpdateReviewDTO,
-  ReviewParamsDTO,
-} from "../dto/reviewDTO";
+import { UpdateReviewDTO, ReviewParamsDTO } from "../dto/reviewDTO";
 import { FavoriteParamsDTO } from "../dto/favoriteDTO";
 import { invalidateCache } from "../middleware/cache";
 import { container } from "../container";
 import { UserService } from "../services/userService";
+
+import {
+  UserResponseDTO,
+  UserReviewListDTO,
+  ReviewIdResponseDTO,
+  FavoriteActionResponseDTO,
+  FavoriteRestaurantListDTO,
+} from "../dto/responseDTO";
+
+import { StatusCodes } from "http-status-codes";
 
 const router = Router();
 const userService = container.resolve(UserService);
@@ -20,7 +27,8 @@ const userService = container.resolve(UserService);
 router.get("/", authMiddleware, (req: AuthRequest, res, next) => {
   try {
     const user = userService.getUserById(req.user!.id);
-    return res.json(user);
+    const response = UserResponseDTO.parse(user);
+    return res.status(StatusCodes.OK).json(response);
   } catch (err) {
     next(err);
   }
@@ -31,8 +39,9 @@ router.get("/", authMiddleware, (req: AuthRequest, res, next) => {
  */
 router.get("/reviews", authMiddleware, (req: AuthRequest, res, next) => {
   try {
-    const rows = userService.listReviewsByUser(req.user!.id);
-    return res.json(rows);
+    const reviews = userService.listReviewsByUser(req.user!.id);
+    const response = UserReviewListDTO.parse(reviews);
+    return res.status(StatusCodes.OK).json(response);
   } catch (err) {
     next(err);
   }
@@ -50,15 +59,14 @@ router.put(
     try {
       const reviewId = Number(req.params.id);
       const { rating, comment } = req.body;
-
       userService.updateUserReview(
         { id: reviewId },
         { rating, comment },
         req.user!.id
       );
-
       invalidateCache();
-      return res.json({ message: "Review updated" });
+      const response = ReviewIdResponseDTO.parse({ id: reviewId });
+      return res.status(StatusCodes.OK).json(response);
     } catch (err) {
       next(err);
     }
@@ -75,11 +83,9 @@ router.delete(
   (req: AuthRequest, res, next) => {
     try {
       const reviewId = Number(req.params.id);
-
       userService.deleteUserReview({ id: reviewId }, req.user!.id);
-
       invalidateCache();
-      return res.status(204).send();
+      return res.status(StatusCodes.NO_CONTENT).send();
     } catch (err) {
       next(err);
     }
@@ -87,20 +93,21 @@ router.delete(
 );
 
 /**
- * POST /me/favorites/:restaurantId
+ * POST /me/favorites/:restaurant_id
  */
 router.post(
-  "/favorites/:restaurantId",
+  "/favorites/:restaurant_id",
   authMiddleware,
   validateParams(FavoriteParamsDTO),
   (req: AuthRequest, res, next) => {
     try {
-      const restaurantId = Number(req.params.restaurantId);
-
+      const restaurantId = Number(req.params.restaurant_id);
       userService.addFavorite(req.user!.id, restaurantId);
-
       invalidateCache();
-      return res.status(201).json({ message: "Favorite added" });
+      const response = FavoriteActionResponseDTO.parse({
+        restaurantId,
+      });
+      return res.status(StatusCodes.CREATED).json(response);
     } catch (err) {
       next(err);
     }
@@ -108,20 +115,18 @@ router.post(
 );
 
 /**
- * DELETE /me/favorites/:restaurantId
+ * DELETE /me/favorites/:restaurant_id
  */
 router.delete(
-  "/favorites/:restaurantId",
+  "/favorites/:restaurant_id",
   authMiddleware,
   validateParams(FavoriteParamsDTO),
   (req: AuthRequest, res, next) => {
     try {
-      const restaurantId = Number(req.params.restaurantId);
-
+      const restaurantId = Number(req.params.restaurant_id);
       userService.removeFavorite(req.user!.id, restaurantId);
-
       invalidateCache();
-      return res.status(204).send();
+      return res.status(StatusCodes.NO_CONTENT).send();
     } catch (err) {
       next(err);
     }
@@ -133,8 +138,9 @@ router.delete(
  */
 router.get("/favorites", authMiddleware, (req: AuthRequest, res, next) => {
   try {
-    const rows = userService.listFavoritesByUser(req.user!.id);
-    return res.json(rows);
+    const favs = userService.listFavoritesByUser(req.user!.id);
+    const response = FavoriteRestaurantListDTO.parse(favs);
+    return res.status(StatusCodes.OK).json(response);
   } catch (err) {
     next(err);
   }
