@@ -1,4 +1,3 @@
-// src/routes/admin.restaurants.ts
 import { Router } from "express";
 import { authMiddleware, roleMiddleware, AuthRequest } from "../middleware/auth";
 import { validateBody, validateParams } from "../middleware/validate";

@@ -15,7 +15,7 @@ import {
 } from "../dto/restaurantDTO";
 
 import {
-  RestaurantListDTO,
+  RestaurantListItemDTO,
   RestaurantDetailDTO,
   RestaurantReviewListDTO,
   ReviewIdResponseDTO,
@@ -40,7 +40,7 @@ router.get(
     try {
       const query = req.query as any; // ya validado por Zod
       const result = restaurantService.listRestaurants(query);
-      const response = RestaurantListDTO.parse(result);
+      const response = RestaurantListItemDTO.parse(result);
       return res.status(StatusCodes.OK).json(response);
     } catch (err) {
       next(err);

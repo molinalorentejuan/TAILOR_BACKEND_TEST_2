@@ -55,6 +55,8 @@ export const RestaurantDetailDTO = RestaurantDTO.extend({
   operating_hours: z.array(OperatingHoursDTO),
 });
 
+export const FavoriteRestaurantListDTO = z.array(FavoriteRestaurantDTO);
+
 /* -------------------------------------------- */
 /* REVIEWS                                       */
 /* -------------------------------------------- */
@@ -78,6 +80,14 @@ export const RestaurantReviewDTO = ReviewBaseDTO.extend({
 export const ReviewIdResponseDTO = z.object({
   id: z.number(),
 });
+
+export const RestaurantReviewListDTO = z.array(RestaurantReviewDTO);
+
+export const RestaurantIdResponseDTO = z.object({
+  id: z.number(),
+});
+
+export const UserReviewListDTO = z.array(UserReviewDTO);
 
 /* -------------------------------------------- */
 /* FAVORITES                                     */

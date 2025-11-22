@@ -1,7 +1,16 @@
-import { StatusCodes } from "http-status-codes";
+// src/errors/errorHandler.ts
+import { Request, Response, NextFunction } from "express";
+import { AppError } from "./appError";
+import { t } from "../i18n";
 import { ZodError } from "zod";
+import { StatusCodes } from "http-status-codes";
 
-export function errorHandler(err, req, res, next) {
+export function errorHandler(
+  err: unknown,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   console.error(err);
 
   if (err instanceof AppError) {
@@ -13,16 +22,16 @@ export function errorHandler(err, req, res, next) {
   }
 
   if (err instanceof ZodError) {
-    const firstIssueKey = err.errors[0]?.message || "VALIDATION_ERROR";
+    const key = err.errors[0]?.message || "VALIDATION_ERROR";
     return res.status(StatusCodes.BAD_REQUEST).json({
       error: "VALIDATION_ERROR",
-      message: t(req, firstIssueKey),
+      message: t(req, key),
       request_id: req.request_id,
     });
   }
 
   return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-    error: "INTERNAL_SERVER_ERROR",
+    error: "INTERNAL_ERROR",
     message: t(req, "INTERNAL_ERROR"),
     request_id: req.request_id,
   });
