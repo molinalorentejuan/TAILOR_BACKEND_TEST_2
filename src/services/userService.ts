@@ -39,30 +39,30 @@ export class UserService {
     data: UpdateReviewInput,
     userId: number
   ) {
-    const review = this.reviewRepo.findUserReview(params.id, userId);
+    const review = this.reviewRepo.findUserReview(params.review_id, userId);
 
     if (!review) {
       throw new AppError("Review not found", 404, "REVIEW_NOT_FOUND");
     }
 
     this.reviewRepo.updateReview(
-      params.id,
+      params.review_id,
       data.rating,
       data.comment ?? undefined
     );
 
-    return { id: params.id };
+    return { review_id: params.review_id };
   }
 
   deleteUserReview(params: ReviewParamsInput, userId: number) {
-    const review = this.reviewRepo.findUserReview(params.id, userId);
+    const review = this.reviewRepo.findUserReview(params.review_id, userId);
 
     if (!review) {
       throw new AppError("Review not found", 404, "REVIEW_NOT_FOUND");
     }
 
-    this.reviewRepo.deleteReview(params.id);
-    return { id: params.id };
+    this.reviewRepo.deleteReview(params.review_id);
+    return { review_id: params.review_id };
   }
 
   addFavorite(userId: number, restaurantId: number) {

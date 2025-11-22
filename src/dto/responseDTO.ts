@@ -55,6 +55,8 @@ export const RestaurantDetailDTO = RestaurantDTO.extend({
   operating_hours: z.array(OperatingHoursDTO),
 });
 
+export const FavoriteRestaurantDTO = RestaurantDTO;
+
 export const FavoriteRestaurantListDTO = z.array(FavoriteRestaurantDTO);
 
 /* -------------------------------------------- */
@@ -65,7 +67,7 @@ export const ReviewBaseDTO = z.object({
   user_id: z.number(),
   restaurant_id: z.number(),
   rating: z.number(),
-  comment: z.string().nullable(), // campo REAL en tu DB
+  comment: z.string().nullable(),
   created_at: z.string(),
 });
 
@@ -73,27 +75,25 @@ export const UserReviewDTO = ReviewBaseDTO.extend({
   restaurant_name: z.string(),
 });
 
+export const UserReviewListDTO = z.array(UserReviewDTO);
+
 export const RestaurantReviewDTO = ReviewBaseDTO.extend({
   user_email: z.string().email(),
 });
+
+export const RestaurantReviewListDTO = z.array(RestaurantReviewDTO);
 
 export const ReviewIdResponseDTO = z.object({
   id: z.number(),
 });
 
-export const RestaurantReviewListDTO = z.array(RestaurantReviewDTO);
-
 export const RestaurantIdResponseDTO = z.object({
   id: z.number(),
 });
 
-export const UserReviewListDTO = z.array(UserReviewDTO);
-
 /* -------------------------------------------- */
 /* FAVORITES                                     */
 /* -------------------------------------------- */
-export const FavoriteRestaurantDTO = RestaurantDTO;
-
 export const FavoriteActionResponseDTO = z.object({
   restaurant_id: z.number(),
 });

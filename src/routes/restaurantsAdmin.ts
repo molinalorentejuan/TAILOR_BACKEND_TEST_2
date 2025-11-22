@@ -51,12 +51,12 @@ router.put(
   validateBody(UpdateRestaurantDTO),
   (req: AuthRequest, res, next) => {
     try {
-      const restaurant_id = req.params.restaurant_id;
+      const restaurant_id = Number(req.params.restaurant_id);
       adminService.updateRestaurant(restaurant_id, req.body);
       invalidateCache();
       return res
         .status(StatusCodes.OK)
-        .json(RestaurantResponseDTO.parse({ id: restaurant_id }));
+        .json(RestaurantIdResponseDTO.parse({ id: restaurant_id }));
     } catch (err) {
       next(err);
     }
@@ -73,7 +73,7 @@ router.delete(
   validateParams(RestaurantParamsDTO),
   (req: AuthRequest, res, next) => {
     try {
-      const restaurant_id = req.params.restaurant_id;
+      const restaurant_id = Number(req.params.restaurant_id);
       adminService.deleteRestaurant(restaurant_id);
       invalidateCache();
       return res.status(StatusCodes.NO_CONTENT).send();

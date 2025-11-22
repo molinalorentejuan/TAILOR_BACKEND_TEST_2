@@ -51,7 +51,7 @@ router.get("/reviews", authMiddleware, (req: AuthRequest, res, next) => {
  * PUT /me/reviews/:id
  */
 router.put(
-  "/reviews/:id",
+  "/reviews/:review_id",
   authMiddleware,
   validateParams(ReviewParamsDTO),
   validateBody(UpdateReviewDTO),
@@ -60,7 +60,7 @@ router.put(
       const reviewId = Number(req.params.id);
       const { rating, comment } = req.body;
       userService.updateUserReview(
-        { id: reviewId },
+        { review_id: reviewId },
         { rating, comment },
         req.user!.id
       );
@@ -77,13 +77,13 @@ router.put(
  * DELETE /me/reviews/:id
  */
 router.delete(
-  "/reviews/:id",
+  "/reviews/:review_id",
   authMiddleware,
   validateParams(ReviewParamsDTO),
   (req: AuthRequest, res, next) => {
     try {
       const reviewId = Number(req.params.id);
-      userService.deleteUserReview({ id: reviewId }, req.user!.id);
+      userService.deleteUserReview({ review_id: reviewId }, req.user!.id);
       invalidateCache();
       return res.status(StatusCodes.NO_CONTENT).send();
     } catch (err) {
