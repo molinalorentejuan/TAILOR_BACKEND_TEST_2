@@ -31,8 +31,5 @@
     "src/types"
   ],
 
-  "exclude": [
-    "src/tests",
-    "**/*.test.ts"
-  ]
+  "exclude": []
 }

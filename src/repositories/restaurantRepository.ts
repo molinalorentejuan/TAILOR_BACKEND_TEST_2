@@ -64,7 +64,7 @@ findRestaurantById(id: number): any {
 
   if (!restaurant) return undefined;
 
-  const operatingHours = db
+  const operating_hours = db
     .prepare(`
       SELECT day, hours
       FROM operating_hours
@@ -75,7 +75,7 @@ findRestaurantById(id: number): any {
 
   return {
     ...restaurant,
-    operatingHours,
+    operating_hours,
   };
 }
 }

@@ -47,6 +47,8 @@ const messages: Record<Lang, Record<string, string>> = {
 
     INVALID_RESTAURANT_ID: "Invalid restaurant ID",
     INVALID_REVIEW_ID: "Invalid review ID",
+
+    REQUIRED: "The field is required:"
   },
 
   es: {
@@ -68,6 +70,7 @@ const messages: Record<Lang, Record<string, string>> = {
     CACHE_MIDDLEWARE_ERROR: "Error en el middleware de caché",
     RATE_LIMIT_AUTH: "Demasiados intentos de login, inténtalo más tarde",
     VALIDATION_ERROR: "Error de validación",
+
 
     // DTO validation
     INVALID_EMAIL: "El email no es válido",
@@ -93,6 +96,8 @@ const messages: Record<Lang, Record<string, string>> = {
 
     INVALID_RESTAURANT_ID: "ID de restaurante inválido",
     INVALID_REVIEW_ID: "ID de reseña inválido",
+
+    REQUIRED: "El campo es obligatorio:"
   },
 
   fr: {
@@ -139,6 +144,8 @@ const messages: Record<Lang, Record<string, string>> = {
 
     INVALID_RESTAURANT_ID: "ID de restaurant invalide",
     INVALID_REVIEW_ID: "ID d'avis invalide",
+
+    REQUIRED: "Le champ est obligatoire :"
   },
 };
 

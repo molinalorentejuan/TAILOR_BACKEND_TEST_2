@@ -4,7 +4,6 @@ import { authMiddleware, roleMiddleware } from "../middleware/auth";
 import { container } from "../container";
 import { AdminService } from "../services/adminService";
 import { StatusCodes } from "http-status-codes";
-import { AdminStatsDTO } from "../dto/responseDTO";
 
 const router = Router();
 const adminService = container.resolve(AdminService);
@@ -18,8 +17,7 @@ router.get(
   roleMiddleware(["ADMIN"]),
   (req, res, next) => {
     try {
-      const stats = adminService.getAdminStats();
-      const response = AdminStatsDTO.parse(stats);
+      const response = adminService.getAdminStats();
       return res.status(StatusCodes.OK).json(response);
     } catch (err) {
       next(err);

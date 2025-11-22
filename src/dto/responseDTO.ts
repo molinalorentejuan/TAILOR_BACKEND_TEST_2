@@ -52,7 +52,7 @@ export const OperatingHoursDTO = z.object({
 });
 
 export const RestaurantDetailDTO = RestaurantDTO.extend({
-  operating_hours: z.array(OperatingHoursDTO),
+  operating_hours: z.array(OperatingHoursDTO).optional(),
 });
 
 export const FavoriteRestaurantDTO = RestaurantDTO;
@@ -67,7 +67,7 @@ export const ReviewBaseDTO = z.object({
   user_id: z.number(),
   restaurant_id: z.number(),
   rating: z.number(),
-  comment: z.string().nullable(),
+  comment: z.string().nullable().optional(),
   created_at: z.string(),
 });
 

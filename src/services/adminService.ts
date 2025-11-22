@@ -1,6 +1,7 @@
 import { injectable, inject } from "tsyringe";
 import { AdminRepository } from "../repositories/adminRepository";
 import { AppError } from "../errors/appError";
+import { AdminStatsDTO } from "../dto/responseDTO";
 
 @injectable()
 export class AdminService {
@@ -18,13 +19,13 @@ export class AdminService {
       const topRated = this.adminRepo.getTopRated();
       const mostReviewed = this.adminRepo.getMostReviewed();
 
-      return {
+      return AdminStatsDTO.parse({
         usersCount,
         reviewsCount,
         restaurantsCount,
         topRated,
         mostReviewed,
-      };
+      });
     } catch (err) {
       throw new AppError("Failed to load admin stats", 500, "ADMIN_STATS_ERROR");
     }

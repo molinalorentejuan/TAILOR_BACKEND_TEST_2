@@ -57,7 +57,7 @@ router.put(
   validateBody(UpdateReviewDTO),
   (req: AuthRequest, res, next) => {
     try {
-      const reviewId = Number(req.params.id);
+      const reviewId = Number(req.params.review_id);
       const { rating, comment } = req.body;
       userService.updateUserReview(
         { review_id: reviewId },
@@ -82,7 +82,7 @@ router.delete(
   validateParams(ReviewParamsDTO),
   (req: AuthRequest, res, next) => {
     try {
-      const reviewId = Number(req.params.id);
+      const reviewId = Number(req.params.review_id);
       userService.deleteUserReview({ review_id: reviewId }, req.user!.id);
       invalidateCache();
       return res.status(StatusCodes.NO_CONTENT).send();
@@ -105,7 +105,7 @@ router.post(
       userService.addFavorite(req.user!.id, restaurantId);
       invalidateCache();
       const response = FavoriteActionResponseDTO.parse({
-        restaurantId,
+        restaurant_id: restaurantId
       });
       return res.status(StatusCodes.CREATED).json(response);
     } catch (err) {
